@@ -47,9 +47,6 @@
 
 <br clear="all"/>
 
-## ⚠️ Important Notice
-- You'll need the DEV version of ESPHome 2025.11.0.
-
 ## ✨ Features
 
 - Status indicators for Wi-Fi, Home Assistant API, thermostat, air conditioner, touchscreen lock, alarm panel

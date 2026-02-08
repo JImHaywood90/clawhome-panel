@@ -4,13 +4,13 @@ packages:
   home: !include pages/home/home.yaml
   light: !include pages/light/config.yaml
   devices: !include common/pages/devices.yaml
-  # alarm_panel: !include pages/alarm_panel/config.yaml
-  # climate: !include pages/climate/climate.yaml
-  # cover: !include pages/cover/config.yaml
-  # fan: !include pages/fan/config.yaml
+  alarm_panel: !include pages/alarm_panel/config.yaml
+  climate: !include pages/climate/climate.yaml
+  cover: !include pages/cover/config.yaml
+  fan: !include pages/fan/config.yaml
   media_player: !include pages/media_player/media_player.yaml
-  # radio: !include pages/radio/radio.yaml
-  # vacuum: !include pages/vacuum/vacuum.yaml
+  radio: !include pages/radio/radio.yaml
+  vacuum: !include pages/vacuum/vacuum.yaml
 
 image: !include common/images.yaml
 font: !include common/fonts.yaml
