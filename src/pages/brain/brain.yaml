@@ -330,7 +330,7 @@ lvgl:
                   x: 30
                   y: 20
                   align: top_left
-                  text_font: mdi_icons_54
+                  text_font: mdi_icons_52
                   text_color: color_teal
                   text: "\U000F09D1"
 

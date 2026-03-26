@@ -303,7 +303,10 @@
     "\U000F02DC", # preset home
     "\U000F0904", # preset sleep
     "\U000F046E", # preset activity
-    "\U000F09D1", # present smart
+    "\U000F09D1", # brain/smart
+    "\U000F004D", # arrow left (back)
+    "\U000F0027", # alert/bell
+    "\U000F040A", # play
     "\U000F0210", # fan on
     "\U000F081D", # fan off
     "\U000F171D", # fan auto
@@ -410,6 +413,13 @@
     "\U000F04DB", # stop
     "\U000F04B2", # sleep
     "\U000F0906", # power
+    "\U000F09D1", # brain/smart
+    "\U000F004D", # arrow left (back)
+    "\U000F0027", # alert/bell
+    "\U000F18DD", # ceiling lights
+    "\U000F1846", # curtains opened
+    "\U000F00AC", # blinds closed
+    "\U000F056E", # devices/dashboard
   ]
 
 

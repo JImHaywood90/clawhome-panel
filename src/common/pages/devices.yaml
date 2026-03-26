@@ -77,7 +77,7 @@ lvgl:
                     - label:
                         y: -15
                         align: center
-                        text_font: mdi_icons_54
+                        text_font: mdi_icons_52
                         text_color: color_amber
                         text: "${climate_icon}"
                     - label:
@@ -104,7 +104,7 @@ lvgl:
                     - label:
                         y: -15
                         align: center
-                        text_font: mdi_icons_54
+                        text_font: mdi_icons_52
                         text_color: color_sky
                         text: "${blinds_opened}"
                     - label:
@@ -137,7 +137,7 @@ lvgl:
                     - label:
                         y: -15
                         align: center
-                        text_font: mdi_icons_54
+                        text_font: mdi_icons_52
                         text_color: color_green
                         text: "${play_icon}"
                     - label:
@@ -164,7 +164,7 @@ lvgl:
                     - label:
                         y: -15
                         align: center
-                        text_font: mdi_icons_54
+                        text_font: mdi_icons_52
                         text_color: color_purple
                         text: "\U000F09D1"
                     - label:
