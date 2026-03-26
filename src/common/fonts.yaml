@@ -1,6 +1,6 @@
 # TEXT FONT
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_16
   size: 16
   bpp: 4
@@ -8,7 +8,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_18
   size: 18
   bpp: 4
@@ -16,7 +16,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_20
   size: 20
   bpp: 4
@@ -24,7 +24,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_24
   size: 24
   bpp: 4
@@ -32,7 +32,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_28
   size: 28
   bpp: 4
@@ -41,7 +41,7 @@
     - GF_Cyrillic_Core
   glyphs: "²"
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_30
   size: 30
   bpp: 4
@@ -49,7 +49,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_36
   size: 36
   bpp: 4
@@ -57,7 +57,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_48
   size: 48
   bpp: 4
@@ -65,7 +65,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_52
   size: 52
   bpp: 4
@@ -73,7 +73,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_56
   size: 56
   bpp: 4
@@ -81,7 +81,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_64
   size: 64
   bpp: 4
@@ -89,7 +89,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_72
   size: 72
   bpp: 4
@@ -97,7 +97,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_84
   size: 84
   bpp: 4
@@ -105,7 +105,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_96
   size: 96
   bpp: 4
@@ -113,7 +113,7 @@
     - GF_Latin_Core
     - GF_Cyrillic_Core
 
-- file: "assets/fonts/Nunito-SemiBold.ttf"
+- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_126
   size: 126
   bpp: 4
@@ -123,7 +123,7 @@
 
 # CUSTOM ICONS FONT
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_24
   size: 24
   bpp: 4
@@ -142,7 +142,7 @@
     "\U0000e938", # humidity
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_28
   size: 28
   bpp: 4
@@ -162,7 +162,7 @@
     "\U0000e921", # ceiling lamp variant
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_32
   size: 32
   bpp: 4
@@ -176,7 +176,7 @@
     "\U0000e911", # volume_plus
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_36
   size: 36
   bpp: 4
@@ -201,7 +201,7 @@
     "\U0000e938", # humidity
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_38
   size: 38
   bpp: 4
@@ -219,7 +219,7 @@
     "\U0000e924", # docked
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_48
   size: 48
   bpp: 4
@@ -237,7 +237,7 @@
     "\U0000e939", # temperature 
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_72
   size: 72
   bpp: 4
@@ -251,7 +251,7 @@
     "\U0000e939", # temperature 
   ]
 
-- file: "assets/fonts/icons_v2.ttf"
+- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_90
   size: 90
   bpp: 4
@@ -282,7 +282,7 @@
 
 # iCONS FONT
 
-- file: "assets/fonts/materialdesignicons-webfont.ttf"
+- file: "clawhome-panel/assets/fonts/materialdesignicons-webfont.ttf"
   id: mdi_icons_36
   size: 36
   bpp: 4
@@ -342,7 +342,7 @@
   ]
 
 
-- file: "assets/fonts/materialdesignicons-webfont.ttf"
+- file: "clawhome-panel/assets/fonts/materialdesignicons-webfont.ttf"
   id: mdi_icons_42
   size: 42
   bpp: 4
@@ -394,7 +394,7 @@
   ]
 
 
-- file: "assets/fonts/materialdesignicons-webfont.ttf"
+- file: "clawhome-panel/assets/fonts/materialdesignicons-webfont.ttf"
   id: mdi_icons_52
   size: 52
   bpp: 4
@@ -419,12 +419,15 @@
     "\U000F18DD", # ceiling lights
     "\U000F1846", # curtains opened
     "\U000F00AC", # blinds closed
+    "\U000F1011", # blinds opened
     "\U000F056E", # devices/dashboard
+    "\U000F0238", # heat (thermostat)
+    "\U000F1A79", # heat_cool
   ]
 
 
 
-- file: "assets/fonts/materialdesignicons-webfont.ttf"
+- file: "clawhome-panel/assets/fonts/materialdesignicons-webfont.ttf"
   id: mdi_icons_60
   size: 60
   bpp: 4
@@ -487,7 +490,7 @@
   ]
 
 
-- file: "assets/fonts/materialdesignicons-webfont.ttf"
+- file: "clawhome-panel/assets/fonts/materialdesignicons-webfont.ttf"
   id: mdi_icons_72
   size: 72
   bpp: 4
@@ -508,7 +511,7 @@
     "\U000F0906", # power
   ]
 
-- file: "assets/fonts/materialdesignicons-webfont.ttf"
+- file: "clawhome-panel/assets/fonts/materialdesignicons-webfont.ttf"
   id: mdi_icons_78
   size: 78
   bpp: 4

@@ -379,6 +379,18 @@ lvgl:
     - id: home_page
       bg_color: color_black
       scrollable: false
+      on_swipe_down:
+        - script.execute:
+            id: switch_to_mode
+            target_mode: 3
+      on_swipe_up:
+        - script.execute:
+            id: switch_to_mode
+            target_mode: 2
+      on_swipe_left:
+        - script.execute:
+            id: switch_to_mode
+            target_mode: 1
       widgets:
         # indicators — ClawHome simplified
         - obj:
@@ -1250,14 +1262,11 @@ lvgl:
             border_width: 0
             radius: 30
             widgets:
-              # Hidden lock button (keep for script compat)
+              # Hidden compat buttons (keep IDs for animation scripts)
               - button:
                   id: display_lock_btn
-                  clickable: true
                   width: 1
                   height: 1
-                  x: 0
-                  y: 0
                   bg_opa: transp
                   shadow_opa: transp
                   border_opa: transp
@@ -1267,105 +1276,20 @@ lvgl:
                     - label:
                         id: display_lock_indicator
                         text: ""
-
-              # Lights button (left)
               - button:
                   id: home_widget_btn
-                  clickable: true
-                  x: 60
-                  width: 120
-                  height: 75
-                  align: left_mid
+                  width: 1
+                  height: 1
                   bg_opa: transp
                   shadow_opa: transp
-                  pressed:
-                    bg_color: color_bg_card_light
+                  border_opa: transp
                   widgets:
                     - label:
-                        y: -8
-                        align: center
-                        text_color: color_teal
-                        text_font: mdi_icons_42
-                        text: "${ceiling_lights_icon}"
-                    - label:
-                        y: 24
-                        align: center
-                        text_color: color_text_dim
-                        text_font: nunito_16
-                        text: "Lights"
-                  on_click:
-                    - script.execute: switch_to_room_1
-                    - delay: 250ms
-                    - lambda: |-
-                        int rooms = ${rooms_amount};
-                        if (rooms >= 2) {
-                          lv_obj_clear_flag(id(room_select_widget), LV_OBJ_FLAG_HIDDEN);
-                        }
-
-              # Home button (center)
-              - button:
-                  id: weather_widget_btn
-                  clickable: true
-                  width: 120
-                  height: 75
-                  align: center
-                  bg_opa: transp
-                  shadow_opa: transp
-                  pressed:
-                    bg_color: color_bg_card_light
-                  widgets:
-                    - label:
-                        y: -8
-                        align: center
-                        text_color: color_text
-                        text_font: mdi_icons_42
-                        text: "${home_icon}"
-                    - label:
-                        y: 24
-                        align: center
-                        text_color: color_text_dim
-                        text_font: nunito_16
-                        text: "Home"
-                  on_click:
-                    - script.execute:
-                        id: switch_to_mode
-                        target_mode: 0
-
-              # Devices button (right)
-              - button:
-                  id: info_widget_btn
-                  clickable: true
-                  x: -60
-                  width: 120
-                  height: 75
-                  align: right_mid
-                  bg_opa: transp
-                  shadow_opa: transp
-                  pressed:
-                    bg_color: color_bg_card_light
-                  widgets:
-                    - label:
-                        y: -8
-                        align: center
-                        text_color: color_sky
-                        text_font: mdi_icons_42
-                        text: "${dashboard_icon}"
-                    - label:
-                        y: 24
-                        align: center
-                        text_color: color_text_dim
-                        text_font: nunito_16
-                        text: "More"
-                  on_click:
-                    - lvgl.page.show: devices_page
-
-              # Hidden buttons (keep IDs for script/animation compat)
+                        text: ""
               - button:
                   id: settings_widget_btn
                   width: 1
                   height: 1
-                  x: 0
-                  y: 0
                   bg_opa: transp
                   shadow_opa: transp
                   border_opa: transp
@@ -1376,14 +1300,71 @@ lvgl:
                   id: backlight_brightness_off_btn
                   width: 1
                   height: 1
-                  x: 0
-                  y: 0
                   bg_opa: transp
                   shadow_opa: transp
                   border_opa: transp
                   widgets:
                     - label:
                         text: ""
+
+              # Brain status (left) — tap to open brain page
+              - button:
+                  id: weather_widget_btn
+                  clickable: true
+                  x: 30
+                  width: 200
+                  height: 75
+                  align: left_mid
+                  bg_opa: transp
+                  shadow_opa: transp
+                  border_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
+                  widgets:
+                    - label:
+                        x: 0
+                        align: left_mid
+                        text_font: mdi_icons_36
+                        text_color: color_teal
+                        text: "\U000F09D1"
+                    - label:
+                        id: bottom_brain_status
+                        x: 45
+                        align: left_mid
+                        text_font: nunito_20
+                        text_color: color_teal
+                        text: "Brain: Idle"
+                  on_click:
+                    - lvgl.page.show: brain_page
+                    - script.execute: fetch_brain_status
+
+              # Devices button (right) — tap to open devices
+              - button:
+                  id: info_widget_btn
+                  clickable: true
+                  x: -30
+                  width: 200
+                  height: 75
+                  align: right_mid
+                  bg_opa: transp
+                  shadow_opa: transp
+                  border_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
+                  widgets:
+                    - label:
+                        x: -45
+                        align: right_mid
+                        text_font: mdi_icons_36
+                        text_color: color_sky
+                        text: "${dashboard_icon}"
+                    - label:
+                        x: 0
+                        align: right_mid
+                        text_font: nunito_20
+                        text_color: color_text_dim
+                        text_align: right
+                        text: "Devices"
 
         # CIRCLE
         - obj:

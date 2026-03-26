@@ -186,16 +186,23 @@ script:
           std::string status = id(brain_status_text);
           lv_label_set_text(id(brain_status_label), status.c_str());
 
+          // Update home page bottom bar brain status
+          std::string bottom_text = "Brain: " + status;
+          lv_label_set_text(id(bottom_brain_status), bottom_text.c_str());
+
           // Status color
+          lv_color_t status_color;
           if (status == "THINKING") {
-            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0xf59e0b), 0);  // amber
+            status_color = lv_color_hex(0xf59e0b);  // amber
           } else if (status == "IDLE") {
-            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0x2dd4bf), 0);  // teal
+            status_color = lv_color_hex(0x2dd4bf);  // teal
           } else if (status == "DISABLED") {
-            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0x64748b), 0);  // dim
+            status_color = lv_color_hex(0x64748b);  // dim
           } else {
-            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0xf43f5e), 0);  // red
+            status_color = lv_color_hex(0xf43f5e);  // red
           }
+          lv_obj_set_style_text_color(id(brain_status_label), status_color, 0);
+          lv_obj_set_style_text_color(id(bottom_brain_status), status_color, 0);
 
           // Reasoning
           lv_label_set_text(id(brain_reasoning_label), id(brain_reasoning_text).c_str());

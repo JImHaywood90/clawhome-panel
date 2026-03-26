@@ -79,7 +79,7 @@ lvgl:
                         align: center
                         text_font: mdi_icons_52
                         text_color: color_amber
-                        text: "${climate_icon}"
+                        text: "\U000F0238"
                     - label:
                         y: 35
                         align: center
@@ -106,7 +106,7 @@ lvgl:
                         align: center
                         text_font: mdi_icons_52
                         text_color: color_sky
-                        text: "${blinds_opened}"
+                        text: "\U000F1011"
                     - label:
                         y: 35
                         align: center
