@@ -7,6 +7,7 @@ packages:
   climate: !include pages/climate/climate.yaml
   cover: !include pages/cover/config.yaml
   media_player: !include pages/media_player/media_player.yaml
+  brain: !include pages/brain/brain.yaml
 
 image: !include common/images.yaml
 font: !include common/fonts.yaml

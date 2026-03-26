@@ -1,0 +1,449 @@
+# ClawHome AI Brain page — shows brain status, last reasoning, alerts
+# Polls ClawHome REST API directly via HTTP
+
+substitutions: !include substitutions.yaml
+
+globals:
+  - id: brain_status_text
+    type: std::string
+    restore_value: no
+    initial_value: '"Connecting..."'
+
+  - id: brain_reasoning_text
+    type: std::string
+    restore_value: no
+    initial_value: '"Waiting for data..."'
+
+  - id: brain_cycle_count_val
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: brain_active_rules_val
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: brain_pending_rules_val
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+  - id: brain_event_brain_connected
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+  - id: clawhome_notification_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+
+interval:
+  # Poll ClawHome brain status every 30 seconds
+  - interval: 30s
+    then:
+      - script.execute: fetch_brain_status
+
+  # Poll ClawHome rules every 60 seconds
+  - interval: 60s
+    then:
+      - script.execute: fetch_rules_status
+
+script:
+  - id: fetch_brain_status
+    then:
+      - http_request.get:
+          url: "${clawhome_url}/api/brain/status"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (status_code == 200) {
+                    JsonDocument doc;
+                    DeserializationError error = deserializeJson(doc, body);
+                    if (!error) {
+                      // Brain enabled/running state
+                      bool enabled = doc["enabled"] | false;
+                      bool running = doc["running"] | false;
+                      int cycles = doc["cycleCount"] | 0;
+
+                      // Event brain
+                      bool eb_connected = doc["eventBrain"]["connected"] | false;
+                      id(brain_event_brain_connected) = eb_connected;
+                      id(brain_cycle_count_val) = cycles;
+
+                      // Derive status
+                      std::string status;
+                      if (!enabled) status = "DISABLED";
+                      else if (running) status = "THINKING";
+                      else status = "IDLE";
+                      id(brain_status_text) = status;
+
+                      // Last reasoning
+                      const char* reasoning = doc["lastResult"]["reasoning"];
+                      if (reasoning) {
+                        std::string r = reasoning;
+                        if (r.length() > 120) r = r.substr(0, 117) + "...";
+                        id(brain_reasoning_text) = r;
+                      }
+
+                      // Update UI
+                      id(update_brain_ui).execute();
+                    }
+                  } else {
+                    id(brain_status_text) = "OFFLINE";
+                    id(update_brain_ui).execute();
+                  }
+
+  - id: fetch_rules_status
+    then:
+      - http_request.get:
+          url: "${clawhome_url}/api/rules?status=active"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (status_code == 200) {
+                    JsonDocument doc;
+                    DeserializationError error = deserializeJson(doc, body);
+                    if (!error && doc.is<JsonArray>()) {
+                      id(brain_active_rules_val) = doc.as<JsonArray>().size();
+                    }
+                  }
+      - http_request.get:
+          url: "${clawhome_url}/api/rules?status=pending_approval"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (status_code == 200) {
+                    JsonDocument doc;
+                    DeserializationError error = deserializeJson(doc, body);
+                    if (!error && doc.is<JsonArray>()) {
+                      id(brain_pending_rules_val) = doc.as<JsonArray>().size();
+                    }
+                  }
+      - lambda: |-
+          // Update alerts on home page top bar
+          int pending = id(brain_pending_rules_val);
+          if (pending > 0) {
+            char buf[16];
+            snprintf(buf, sizeof(buf), "%d alert%s", pending, pending > 1 ? "s" : "");
+            lv_label_set_text(id(heating_status), buf);
+          } else {
+            lv_label_set_text(id(heating_status), "");
+          }
+      - script.execute: update_brain_ui
+
+  - id: update_brain_ui
+    then:
+      - lambda: |-
+          // Status
+          std::string status = id(brain_status_text);
+          lv_label_set_text(id(brain_status_label), status.c_str());
+
+          // Status color
+          if (status == "THINKING") {
+            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0xf59e0b), 0);  // amber
+          } else if (status == "IDLE") {
+            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0x2dd4bf), 0);  // teal
+          } else if (status == "DISABLED") {
+            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0x64748b), 0);  // dim
+          } else {
+            lv_obj_set_style_text_color(id(brain_status_label), lv_color_hex(0xf43f5e), 0);  // red
+          }
+
+          // Reasoning
+          lv_label_set_text(id(brain_reasoning_label), id(brain_reasoning_text).c_str());
+
+          // Cycles
+          char cycles_buf[32];
+          snprintf(cycles_buf, sizeof(cycles_buf), "%d", id(brain_cycle_count_val));
+          lv_label_set_text(id(brain_cycles_value), cycles_buf);
+
+          // Rules
+          char rules_buf[32];
+          snprintf(rules_buf, sizeof(rules_buf), "%d active", id(brain_active_rules_val));
+          lv_label_set_text(id(brain_rules_value), rules_buf);
+
+          // Pending
+          char pending_buf[32];
+          int pending = id(brain_pending_rules_val);
+          if (pending > 0) {
+            snprintf(pending_buf, sizeof(pending_buf), "%d pending", pending);
+            lv_obj_set_style_text_color(id(brain_pending_value), lv_color_hex(0xf59e0b), 0);
+          } else {
+            snprintf(pending_buf, sizeof(pending_buf), "None");
+            lv_obj_set_style_text_color(id(brain_pending_value), lv_color_hex(0x64748b), 0);
+          }
+          lv_label_set_text(id(brain_pending_value), pending_buf);
+
+          // Event brain indicator
+          if (id(brain_event_brain_connected)) {
+            lv_label_set_text(id(brain_eventbrain_value), "Connected");
+            lv_obj_set_style_text_color(id(brain_eventbrain_value), lv_color_hex(0x22c55e), 0);
+          } else {
+            lv_label_set_text(id(brain_eventbrain_value), "Disconnected");
+            lv_obj_set_style_text_color(id(brain_eventbrain_value), lv_color_hex(0xf43f5e), 0);
+          }
+
+  - id: trigger_brain_cycle
+    then:
+      - http_request.post:
+          url: "${clawhome_url}/api/brain/status"
+          json:
+            action: "run"
+          on_response:
+            then:
+              - lambda: |-
+                  if (status_code == 200) {
+                    id(brain_status_text) = "THINKING";
+                    id(update_brain_ui).execute();
+                  }
+      # Refresh after a delay to get the result
+      - delay: 10s
+      - script.execute: fetch_brain_status
+
+lvgl:
+  pages:
+    - id: brain_page
+      bg_color: color_bg
+      scrollable: false
+      widgets:
+        # Header
+        - obj:
+            width: 660
+            height: 60
+            y: 20
+            align: top_mid
+            bg_opa: transp
+            border_opa: transp
+            shadow_opa: transp
+            widgets:
+              - button:
+                  id: brain_back_btn
+                  x: 15
+                  width: 60
+                  height: 60
+                  align: left_mid
+                  radius: 30
+                  bg_color: color_bg_card
+                  border_opa: transp
+                  shadow_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
+                  widgets:
+                    - label:
+                        align: center
+                        text_font: mdi_icons_36
+                        text_color: color_teal
+                        text: "\U000F004D"
+                  on_click:
+                    - lvgl.page.show: home_page
+
+              - label:
+                  align: center
+                  text_font: nunito_28
+                  text_color: color_text
+                  text: "AI Brain"
+
+              # Run brain button (top right)
+              - button:
+                  id: brain_run_btn
+                  x: -15
+                  width: 60
+                  height: 60
+                  align: right_mid
+                  radius: 30
+                  bg_color: color_bg_card
+                  border_opa: transp
+                  shadow_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
+                  widgets:
+                    - label:
+                        align: center
+                        text_font: mdi_icons_36
+                        text_color: color_teal
+                        text: "\U000F040A"
+                  on_click:
+                    - script.execute: trigger_brain_cycle
+
+        # Status card
+        - obj:
+            y: 100
+            width: 660
+            height: 120
+            align: top_mid
+            radius: 20
+            bg_color: color_bg_card
+            border_opa: transp
+            shadow_opa: transp
+            clickable: false
+            widgets:
+              # Brain icon
+              - label:
+                  x: 30
+                  y: 20
+                  align: top_left
+                  text_font: mdi_icons_54
+                  text_color: color_teal
+                  text: "\U000F09D1"
+
+              # Status label
+              - label:
+                  id: brain_status_label
+                  x: 105
+                  y: 20
+                  align: top_left
+                  text_font: nunito_36
+                  text_color: color_teal
+                  text: "Connecting..."
+
+              # Cycles count
+              - label:
+                  x: 105
+                  y: 68
+                  align: top_left
+                  text_font: nunito_20
+                  text_color: color_text_dim
+                  text: "Cycles:"
+
+              - label:
+                  id: brain_cycles_value
+                  x: 195
+                  y: 68
+                  align: top_left
+                  text_font: nunito_20
+                  text_color: color_text
+                  text: "0"
+
+              # Event brain status
+              - label:
+                  x: -30
+                  y: 68
+                  align: top_right
+                  text_font: nunito_20
+                  text_color: color_text_dim
+                  text: "Events:"
+
+              - label:
+                  id: brain_eventbrain_value
+                  x: -30
+                  y: 68
+                  width: 150
+                  align: top_right
+                  text_font: nunito_20
+                  text_color: color_green
+                  text_align: right
+                  text: "..."
+
+        # Last reasoning card
+        - obj:
+            y: 240
+            width: 660
+            height: 150
+            align: top_mid
+            radius: 20
+            bg_color: color_bg_card
+            border_opa: transp
+            shadow_opa: transp
+            clickable: false
+            widgets:
+              - label:
+                  x: 30
+                  y: 15
+                  align: top_left
+                  text_font: nunito_20
+                  text_color: color_text_dim
+                  text: "Last Reasoning"
+
+              - label:
+                  id: brain_reasoning_label
+                  x: 30
+                  y: 48
+                  width: 600
+                  height: 85
+                  align: top_left
+                  text_font: nunito_20
+                  text_color: color_text
+                  long_mode: WRAP
+                  text: "Waiting for data..."
+
+        # Rules card
+        - obj:
+            y: 410
+            width: 660
+            height: 100
+            align: top_mid
+            radius: 20
+            bg_color: color_bg_card
+            border_opa: transp
+            shadow_opa: transp
+            clickable: false
+            widgets:
+              - label:
+                  x: 30
+                  y: 15
+                  align: top_left
+                  text_font: nunito_20
+                  text_color: color_text_dim
+                  text: "Smart Rules"
+
+              - label:
+                  id: brain_rules_value
+                  x: 30
+                  y: 50
+                  align: top_left
+                  text_font: nunito_24
+                  text_color: color_text
+                  text: "0 active"
+
+              - label:
+                  x: -30
+                  y: 15
+                  align: top_right
+                  text_font: nunito_20
+                  text_color: color_text_dim
+                  text: "Suggestions"
+
+              - label:
+                  id: brain_pending_value
+                  x: -30
+                  y: 50
+                  align: top_right
+                  text_font: nunito_24
+                  text_color: color_text_dim
+                  text: "None"
+
+        # Notification bar (bottom, shows latest ClawHome notification)
+        - obj:
+            id: brain_notification_bar
+            y: 530
+            width: 660
+            height: 80
+            align: top_mid
+            radius: 20
+            bg_color: color_bg_card
+            border_opa: transp
+            shadow_opa: transp
+            clickable: false
+            hidden: true
+            widgets:
+              - label:
+                  x: 30
+                  align: left_mid
+                  text_font: mdi_icons_36
+                  text_color: color_amber
+                  text: "\U000F0027"
+
+              - label:
+                  id: brain_notification_label
+                  x: 75
+                  width: 555
+                  align: left_mid
+                  text_font: nunito_20
+                  text_color: color_text
+                  long_mode: SCROLL_CIRCULAR
+                  text: ""

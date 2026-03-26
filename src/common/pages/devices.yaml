@@ -149,9 +149,9 @@ lvgl:
                   on_click:
                     - lvgl.page.show: media_player_page
 
-              # Lights card (quick shortcut back)
+              # AI Brain card
               - button:
-                  id: devices_lights_btn
+                  id: devices_brain_btn
                   width: 300
                   height: 160
                   radius: 20
@@ -165,19 +165,15 @@ lvgl:
                         y: -15
                         align: center
                         text_font: mdi_icons_54
-                        text_color: color_teal
-                        text: "${ceiling_lights_icon}"
+                        text_color: color_purple
+                        text: "\U000F09D1"
                     - label:
                         y: 35
                         align: center
                         text_font: nunito_24
                         text_color: color_text
-                        text: "Lights"
+                        text: "AI Brain"
                   on_click:
-                    - script.execute: switch_to_room_1
-                    - delay: 250ms
-                    - lambda: |-
-                        int rooms = ${rooms_amount};
-                        if (rooms >= 2) {
-                          lv_obj_clear_flag(id(room_select_widget), LV_OBJ_FLAG_HIDDEN);
-                        }
+                    - lvgl.page.show: brain_page
+                    - script.execute: fetch_brain_status
+                    - script.execute: fetch_rules_status
