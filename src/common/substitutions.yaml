@@ -1,12 +1,12 @@
 # NAMES
 
-name:          esp32-p4-waveshare-1
-friendly_name: ESP32-P4-86-Panel-ETH-2RO-1
+name:          clawhome-panel
+friendly_name: ClawHome Panel
 
 
 # ENTITIES
 
-weather_entity:           "weather.home_assistant"
+weather_entity:           "weather.forecast_home"
 temperature_entity:       "sensor.outside_temperature"
 humidity_entity:          "sensor.outside_humidity"
 
@@ -14,8 +14,8 @@ humidity_entity:          "sensor.outside_humidity"
 
 # SETTINGS
 
-secondary_language:        "ru"
-timezone:                  "Europe/Moscow"
+secondary_language:        "en"
+timezone:                  "Europe/London"
 
 # ICONS
 

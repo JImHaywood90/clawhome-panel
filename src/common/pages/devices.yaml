@@ -26,29 +26,6 @@ lvgl:
               flex_align_track: center
             widgets:
 
-              # Alarm panel button
-              - button:
-                  id: devices_alarm_panel_btn
-                  width: 300
-                  height: 60
-                  bg_opa: transp
-                  shadow_opa: transp
-                  border_opa: transp
-                  widgets:
-                    - label:
-                        align: center
-                        text_font: nunito_28
-                        text_color: color_misty_blue
-                        text: "Alarm Panel"
-                  on_click:
-                    - lvgl.page.show: ${alarm_panel_widget_name_1}_page
-                    - delay: 250ms
-                    - lambda: |-
-                        int alarm_panels = ${alarm_panels_amount};
-                        if (alarm_panels >= 2) {
-                          lv_obj_clear_flag(id(alarm_panel_select_widget), LV_OBJ_FLAG_HIDDEN);
-                        }
-
               # Climate button
               - button:
                   id: devices_climate_btn
@@ -89,29 +66,6 @@ lvgl:
                           lv_obj_clear_flag(id(cover_select_widget), LV_OBJ_FLAG_HIDDEN);
                         }
 
-              # Fan button
-              - button:
-                  id: devices_fan_btn
-                  width: 300
-                  height: 60
-                  bg_opa: transp
-                  shadow_opa: transp
-                  border_opa: transp
-                  widgets:
-                    - label:
-                        align: center
-                        text_font: nunito_28
-                        text_color: color_misty_blue
-                        text: "Fan"
-                  on_click:
-                    - lvgl.page.show: ${fan_widget_name_1}_page
-                    - delay: 250ms
-                    - lambda: |-
-                        int fans = ${fans_amount};
-                        if (fans >= 2) {
-                          lv_obj_clear_flag(id(fan_select_widget), LV_OBJ_FLAG_HIDDEN);
-                        }
-
               # Media Player button
               - button:
                   id: devices_media_player_btn
@@ -129,36 +83,3 @@ lvgl:
                   on_click:
                     - lvgl.page.show: media_player_page
 
-              # Radio button
-              - button:
-                  id: devices_radio_btn
-                  width: 300
-                  height: 60
-                  bg_opa: transp
-                  shadow_opa: transp
-                  border_opa: transp
-                  widgets:
-                    - label:
-                        align: center
-                        text_font: nunito_28
-                        text_color: color_misty_blue
-                        text: "Radio"
-                  on_click:
-                    - lvgl.page.show: radio_page
-
-              # Vacuum button
-              - button:
-                  id: devices_vacuum_btn
-                  width: 300
-                  height: 60
-                  bg_opa: transp
-                  shadow_opa: transp
-                  border_opa: transp
-                  widgets:
-                    - label:
-                        align: center
-                        text_font: nunito_28
-                        text_color: color_misty_blue
-                        text: "Vacuum"
-                  on_click:
-                    - lvgl.page.show: vacuum_page
