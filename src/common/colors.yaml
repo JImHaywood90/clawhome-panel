@@ -1,50 +1,82 @@
-- id: color_sky_blue
-  hex: 3FA7F3
-- id: color_slate_blue_gray
-  hex: 343645
-- id: color_steel_blue
-  hex: 606682
-- id: color_misty_blue
-  hex: 9BA2BC
-- id: color_black
-  hex: 0d0d0d
-- id: color_dark_gray
-  hex: 333333
-- id: color_gray
-  hex: 666666
-- id: color_light_gray
-  hex: 999999
-- id: color_white
-  hex: f2f0eb
-- id: color_red
-  hex: ff0000
-- id: color_crimson
-  hex: f5075c
-- id: color_light_blue
-  hex: 2fc0ff
-- id: color_blue
-  hex: 4C9FFF
-- id: color_yellow
-  hex: e7c12c
-- id: color_light_yellow
-  hex: f0d45c
+# ClawHome HUD colour scheme
+# Primary: teal (#2dd4bf), Sky: (#38bdf8), Amber: (#f59e0b)
+# Background: dark navy (#0a0f1a), Cards: (#0f172a)
+
+- id: color_teal
+  hex: 2dd4bf
+- id: color_teal_dim
+  hex: 1a8070
+- id: color_sky
+  hex: 38bdf8
+- id: color_sky_dim
+  hex: 1e6a8a
 - id: color_amber
-  hex: f4a900
-- id: color_mint
-  hex: 39d19c
-- id: color_light_mint
-  hex: 66dcb3
-- id: color_light_green
-  hex: 00ff00
+  hex: f59e0b
+- id: color_red
+  hex: f43f5e
 - id: color_green
-  hex: 5CA848
+  hex: 22c55e
+- id: color_purple
+  hex: a78bfa
+
+# Backgrounds
+- id: color_bg
+  hex: 0a0f1a
+- id: color_bg_card
+  hex: 0f172a
+- id: color_bg_card_light
+  hex: 1e293b
+
+# Text
+- id: color_text
+  hex: e2e8f0
+- id: color_text_dim
+  hex: 64748b
+
+# Grays (compatibility aliases)
+- id: color_black
+  hex: 0a0f1a
+- id: color_dark_gray
+  hex: 1e293b
+- id: color_gray
+  hex: 475569
+- id: color_light_gray
+  hex: 94a3b8
+- id: color_white
+  hex: f1f5f9
+
+# Legacy aliases (so existing YAML doesn't break)
+- id: color_slate_blue_gray
+  hex: 0f172a
+- id: color_steel_blue
+  hex: 475569
+- id: color_misty_blue
+  hex: e2e8f0
+- id: color_sky_blue
+  hex: 38bdf8
+- id: color_light_blue
+  hex: 38bdf8
+- id: color_blue
+  hex: 38bdf8
+- id: color_yellow
+  hex: f59e0b
+- id: color_light_yellow
+  hex: fbbf24
 - id: color_orange
-  hex: f07c40
+  hex: f59e0b
 - id: color_deep_orange
-  hex: ff6600
+  hex: f97316
+- id: color_crimson
+  hex: f43f5e
+- id: color_mint
+  hex: 2dd4bf
+- id: color_light_mint
+  hex: 5eead4
+- id: color_light_green
+  hex: 22c55e
 - id: color_violet
-  hex: 926BC7
+  hex: a78bfa
 - id: color_dark_blue
-  hex: 4867aa
+  hex: 1e3a5f
 - id: color_deep_purple
-  hex: 543D72
+  hex: 7c3aed
