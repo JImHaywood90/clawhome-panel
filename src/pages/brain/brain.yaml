@@ -102,7 +102,7 @@ script:
           on_response:
             then:
               - lambda: |-
-                  if (status_code == 200) {
+                  if (response->status_code == 200) {
                     JsonDocument doc;
                     DeserializationError error = deserializeJson(doc, body);
                     if (!error) {
@@ -147,7 +147,7 @@ script:
           on_response:
             then:
               - lambda: |-
-                  if (status_code == 200) {
+                  if (response->status_code == 200) {
                     JsonDocument doc;
                     DeserializationError error = deserializeJson(doc, body);
                     if (!error && doc.is<JsonArray>()) {
@@ -160,7 +160,7 @@ script:
           on_response:
             then:
               - lambda: |-
-                  if (status_code == 200) {
+                  if (response->status_code == 200) {
                     JsonDocument doc;
                     DeserializationError error = deserializeJson(doc, body);
                     if (!error && doc.is<JsonArray>()) {
@@ -240,7 +240,7 @@ script:
           on_response:
             then:
               - lambda: |-
-                  if (status_code == 200) {
+                  if (response->status_code == 200) {
                     id(brain_status_text) = "THINKING";
                     id(update_brain_ui).execute();
                   }
