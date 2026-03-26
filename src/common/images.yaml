@@ -1,12 +1,3 @@
-################# test ###########
-
-- file: 'assets/images/radio/europa_plus.png'
-  id: europa_plus_img
-  type: rgb565
-  resize: 291x600  # 194x400 * 1.5
-  transparency: alpha_channel
-  byte_order: little_endian
-
   #############################
   ########### LOGO ############
   #############################
@@ -39,37 +30,6 @@
 #   id: rgb_img
 #   type: rgb565
 #   transparency: alpha_channel
-
-  #############################
-  ########## VACUUM ###########
-  #############################
-
-- file: 'assets/images/vacuum/vacuum.png'
-  id: vacuum_img
-  type: rgb565
-  resize: 240x240
-  byte_order: little_endian
-  transparency: alpha_channel
-
-
-  #############################
-  ########### FAN #############
-  #############################
-
-- file: 'assets/images/fan/fan_green.png'
-  id: fan_green_image
-  type: rgb565
-  transparency: alpha_channel
-  byte_order: little_endian
-  resize: 75x75
-
-- file: 'assets/images/fan/fan_misty.png'
-  id: fan_misty_image
-  type: rgb565
-  transparency: alpha_channel
-  byte_order: little_endian
-  resize: 75x75
-
 
   #############################
   ########## WEATHER ##########
@@ -436,73 +396,4 @@
   resize: 60x90
   transparency: alpha_channel
 
-  #############################
-  ########## BATTERY ##########
-  #############################
-
-- file: 'assets/images/battery/battery_very_high.png'
-  id: battery_very_high_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_high.png'
-  id: battery_high_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_middle.png'
-  id: battery_middle_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_low.png'
-  id: battery_low_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_very_low.png'
-  id: battery_very_low_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_empty.png'
-  id: battery_empty_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_80.png'
-  id: battery_80_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_60.png'
-  id: battery_60_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_40.png'
-  id: battery_40_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_20.png'
-  id: battery_20_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
-
-- file: 'assets/images/battery/battery_0.png'
-  id: battery_0_img
-  type: rgb565
-  byte_order: little_endian
-  transparency: alpha_channel
 
