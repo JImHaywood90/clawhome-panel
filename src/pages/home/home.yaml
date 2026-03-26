@@ -380,7 +380,7 @@ lvgl:
       bg_color: color_black
       scrollable: false
       widgets:
-        # indicators
+        # indicators — ClawHome simplified
         - obj:
             id: home_bg_indicators
             y: 15
@@ -388,7 +388,6 @@ lvgl:
             height: 60
             align: TOP_MID
             pad_all: 0
-            bg_color: color_steel_blue
             bg_opa: transp
             border_opa: transp
             border_width: 0
@@ -401,53 +400,50 @@ lvgl:
                   align: left_mid
                   x: 30
                   text: "${wifi_100_icon}"
-                  text_color: color_steel_blue
+                  text_color: color_text_dim
                   text_font: icons_36
 
-              # Home Assistant status
+              # ClawHome connection status (replaces HA icon)
               - label:
                   id: ha_status
                   align: left_mid
                   x: 90
-                  text: "${ha_icon}"
-                  text_color: color_steel_blue
+                  text: "\U000F09D1"
+                  text_color: color_teal
                   text_font: mdi_icons_36
 
-              # Lock status
+              # Lock status (hidden by default, shown when locked)
               - label:
                   id: lock_status
                   align: left_mid
                   x: 150
                   text: "${lock_icon}"
-                  text_color: color_steel_blue
+                  text_color: color_text_dim
                   text_font: icons_36
 
-              # Heating status
+              # Alerts count (right side)
               - label:
                   id: heating_status
                   align: right_mid
                   x: -30
-                  text: "${heating_icon}"
-                  text_color: color_steel_blue
-                  text_font: icons_36
+                  text: ""
+                  text_color: color_amber
+                  text_font: nunito_24
 
-              # AC status
+              # Hidden placeholders (keep IDs so scripts don't break)
               - label:
                   id: ac_status
                   align: right_mid
                   x: -90
-                  y: 3
-                  text: "${air_conditioner_icon}"
-                  text_color: color_steel_blue
+                  text: ""
+                  text_color: color_text_dim
                   text_font: icons_36
-
-              # Alarm panel status
               - label:
                   id: alarm_panel_status
                   align: right_mid
                   x: -150
-                  text: "${shield_arming_icon}"
-                  text_color: color_steel_blue
+                  text: ""
+                  text_color: color_text_dim
                   text_font: mdi_icons_36
 
         # weather
@@ -1239,7 +1235,7 @@ lvgl:
                           container:
                             hidden: true
 
-        # SYSTEM BUTTONS (DOWN) 
+        # BOTTOM NAV — simplified: Lights, Home, Devices
         - obj:
             id: menu_controls_background
             x: 0
@@ -1248,143 +1244,146 @@ lvgl:
             height: 90
             pad_all: 0
             align: bottom_mid
-            bg_color: color_slate_blue_gray
+            bg_color: color_bg_card
             shadow_opa: transp
             border_opa: transp
             border_width: 0
             radius: 30
             widgets:
+              # Hidden lock button (keep for script compat)
               - button:
                   id: display_lock_btn
                   clickable: true
-                  x: 15
-                  width: 75
-                  height: 75
-                  align: left_mid
+                  width: 1
+                  height: 1
+                  x: 0
+                  y: 0
                   bg_opa: transp
                   shadow_opa: transp
+                  border_opa: transp
                   checked:
                     bg_opa: transp
                   widgets:
                     - label:
                         id: display_lock_indicator
-                        align: center
-                        text_color: color_misty_blue
-                        text_font: mdi_icons_42
-                        text: "${lock_variant_icon}"
-                  on_long_press:
-                    - switch.toggle: display_lock_switch
+                        text: ""
 
-              - button:
-                  id: backlight_brightness_off_btn
-                  clickable: true
-                  x: 90
-                  width: 75
-                  height: 75
-                  align: left_mid
-                  bg_opa: transp
-                  shadow_opa: transp
-                  widgets:
-                    - label:
-                        align: center
-                        text_color: color_misty_blue
-                        text_font: mdi_icons_42
-                        text: "${brightness_icon}"
-                  on_click:
-                    - delay: 1s
-                    - light.turn_off: display_backlight
-                    - lvgl.pause:
-
-
+              # Lights button (left)
               - button:
                   id: home_widget_btn
                   clickable: true
-                  x: 165
-                  width: 75
+                  x: 60
+                  width: 120
                   height: 75
                   align: left_mid
                   bg_opa: transp
                   shadow_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
                   widgets:
                     - label:
+                        y: -8
                         align: center
-                        text_color: color_misty_blue
+                        text_color: color_teal
+                        text_font: mdi_icons_42
+                        text: "${ceiling_lights_icon}"
+                    - label:
+                        y: 24
+                        align: center
+                        text_color: color_text_dim
+                        text_font: nunito_16
+                        text: "Lights"
+                  on_click:
+                    - script.execute: switch_to_room_1
+                    - delay: 250ms
+                    - lambda: |-
+                        int rooms = ${rooms_amount};
+                        if (rooms >= 2) {
+                          lv_obj_clear_flag(id(room_select_widget), LV_OBJ_FLAG_HIDDEN);
+                        }
+
+              # Home button (center)
+              - button:
+                  id: weather_widget_btn
+                  clickable: true
+                  width: 120
+                  height: 75
+                  align: center
+                  bg_opa: transp
+                  shadow_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
+                  widgets:
+                    - label:
+                        y: -8
+                        align: center
+                        text_color: color_text
                         text_font: mdi_icons_42
                         text: "${home_icon}"
+                    - label:
+                        y: 24
+                        align: center
+                        text_color: color_text_dim
+                        text_font: nunito_16
+                        text: "Home"
                   on_click:
                     - script.execute:
                         id: switch_to_mode
                         target_mode: 0
 
-              - button:
-                  id: weather_widget_btn
-                  clickable: true
-                  x: -165
-                  width: 75
-                  height: 75
-                  align: right_mid
-                  bg_opa: transp
-                  shadow_opa: transp
-                  widgets:
-                    - label:
-                        align: center
-                        text_color: color_misty_blue
-                        text_font: mdi_icons_42
-                        text: "${weather_icon}"
-                  on_click:
-                    - homeassistant.action:
-                        action: display_tools.get_forecasts
-                        data:
-                          entity_id: "${weather_entity}"
-                          type: "daily"
-                    - homeassistant.action:
-                        action: display_tools.get_forecasts
-                        data:
-                          entity_id: "${weather_entity}"
-                          type: "hourly"
-                    - script.execute:
-                        id: switch_to_mode
-                        target_mode: 1
-
+              # Devices button (right)
               - button:
                   id: info_widget_btn
                   clickable: true
-                  x: -90
-                  width: 75
+                  x: -60
+                  width: 120
                   height: 75
                   align: right_mid
                   bg_opa: transp
                   shadow_opa: transp
+                  pressed:
+                    bg_color: color_bg_card_light
                   widgets:
                     - label:
+                        y: -8
                         align: center
-                        text_color: color_misty_blue
+                        text_color: color_sky
                         text_font: mdi_icons_42
-                        text: "${info_icon}"
+                        text: "${dashboard_icon}"
+                    - label:
+                        y: 24
+                        align: center
+                        text_color: color_text_dim
+                        text_font: nunito_16
+                        text: "More"
                   on_click:
-                    - script.execute:
-                        id: switch_to_mode
-                        target_mode: 2
+                    - lvgl.page.show: devices_page
 
+              # Hidden buttons (keep IDs for script/animation compat)
               - button:
                   id: settings_widget_btn
-                  clickable: true
-                  x: -15
-                  width: 75
-                  height: 75
-                  align: right_mid
+                  width: 1
+                  height: 1
+                  x: 0
+                  y: 0
                   bg_opa: transp
                   shadow_opa: transp
+                  border_opa: transp
                   widgets:
                     - label:
-                        align: center
-                        text_color: color_misty_blue
-                        text_font: mdi_icons_42
-                        text: "${settings_icon}"
-                  on_click:
-                    - script.execute:
-                        id: switch_to_mode
-                        target_mode: 3
+                        text: ""
+              - button:
+                  id: backlight_brightness_off_btn
+                  width: 1
+                  height: 1
+                  x: 0
+                  y: 0
+                  bg_opa: transp
+                  shadow_opa: transp
+                  border_opa: transp
+                  widgets:
+                    - label:
+                        text: ""
 
         # CIRCLE
         - obj:
@@ -1592,7 +1591,7 @@ lvgl:
                           - image:
                               id: circle_settings_widget_lang_flag
                               align: center
-                              src: flags_ru_img
+                              src: flags_gb_img
                         on_click:
                           - switch.toggle: language_switch
 
@@ -1602,16 +1601,7 @@ mapping:
     from: string
     to: image
     entries:
-      de: flags_de_img
-      es: flags_es_img
-      fr: flags_fr_img
       en: flags_gb_img
-      it: flags_it_img
-      pt: flags_pt_img
-      ru: flags_ru_img
-      nl: flags_nl_img
-      si: flags_si_img
-      pl: flags_pl_img
 
 script:
 
@@ -2502,10 +2492,6 @@ script:
           
           ESP_LOGI("weather", "✅ Created %d hourly items with scroll", id(forecast_hourly_count));
 
-
-
-
-
   - id: test_timezone
     then:
       - lambda: |-
@@ -2550,3 +2536,4 @@ script:
           ESP_LOGI("TZ_TEST", "Offset: %+d seconds (%+d hours)", 
                   total_offset, offset_hours);
           ESP_LOGI("TZ_TEST", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
