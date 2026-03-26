@@ -1,1 +1,5 @@
 clawhome_url: "http://192.168.1.15:3000"
+
+# Physical button GPIO — top button on Waveshare P4-86 panel
+# Bottom button is hardware RST (reset) — not reprogrammable
+physical_button_pin: "0"

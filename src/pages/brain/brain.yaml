@@ -3,6 +3,49 @@
 
 substitutions: !include substitutions.yaml
 
+# Physical button (top button on panel, GPIO0)
+# Single click: show brain page
+# Double click: trigger brain cycle
+# Long press (3s): restart device
+binary_sensor:
+  - platform: gpio
+    id: panel_top_button
+    pin:
+      number: ${physical_button_pin}
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Panel Button"
+    on_click:
+      min_length: 50ms
+      max_length: 500ms
+      then:
+        - logger.log: "Button: single press — show brain"
+        - if:
+            condition: lvgl.is_paused
+            then:
+              - lvgl.resume:
+              - lvgl.widget.redraw:
+              - light.turn_on: display_backlight
+        - lvgl.page.show: brain_page
+        - script.execute: fetch_brain_status
+    on_double_click:
+      min_length: 50ms
+      max_length: 400ms
+      then:
+        - logger.log: "Button: double press — run brain cycle"
+        - script.execute: trigger_brain_cycle
+    on_multi_click:
+      - timing:
+          - ON for at least 3s
+        then:
+          - logger.log: "Button: long press — restarting"
+          - button.press: restart_btn
+
+button:
+  - platform: restart
+    id: restart_btn
+    name: "Restart Panel"
+
 globals:
   - id: brain_status_text
     type: std::string
