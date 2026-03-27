@@ -93,7 +93,40 @@ interval:
     then:
       - script.execute: fetch_rules_status
 
+  # Poll notifications every 15 seconds
+  - interval: 15s
+    then:
+      - script.execute: fetch_notifications
+
 script:
+  - id: fetch_notifications
+    then:
+      - http_request.get:
+          url: "${clawhome_url}/api/clawhome/notifications"
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code == 200 && body.length() > 0) {
+                    JsonDocument doc;
+                    DeserializationError error = deserializeJson(doc, body);
+                    if (!error) {
+                      const char* msg = doc["message"];
+                      const char* ts = doc["ts"];
+                      if (msg && strlen(msg) > 0) {
+                        std::string new_msg = msg;
+                        if (new_msg != id(clawhome_notification_text)) {
+                          id(clawhome_notification_text) = new_msg;
+                          lv_label_set_text(id(brain_notification_label), msg);
+                          lv_obj_clear_flag(id(brain_notification_bar), LV_OBJ_FLAG_HIDDEN);
+                          ESP_LOGI("notify", "New notification: %s", msg);
+                        }
+                      } else {
+                        lv_obj_add_flag(id(brain_notification_bar), LV_OBJ_FLAG_HIDDEN);
+                      }
+                    }
+                  }
+
   - id: fetch_brain_status
     then:
       - http_request.get:
