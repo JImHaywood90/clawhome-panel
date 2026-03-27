@@ -1340,7 +1340,6 @@ lvgl:
                         text: "Brain: Idle"
                   on_click:
                     - lvgl.page.show: brain_page
-                    - script.execute: fetch_brain_status
 
               # Devices button (right) — tap to open devices
               - button:
