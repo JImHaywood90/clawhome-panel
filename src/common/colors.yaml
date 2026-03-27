@@ -27,9 +27,9 @@
 - id: color_bg_card_light
   hex: 1e293b
 
-# Text
+# Text — teal as primary text colour
 - id: color_text
-  hex: e2e8f0
+  hex: 2dd4bf
 - id: color_text_dim
   hex: 64748b
 
@@ -51,7 +51,7 @@
 - id: color_steel_blue
   hex: 475569
 - id: color_misty_blue
-  hex: e2e8f0
+  hex: 2dd4bf
 - id: color_sky_blue
   hex: 38bdf8
 - id: color_light_blue
