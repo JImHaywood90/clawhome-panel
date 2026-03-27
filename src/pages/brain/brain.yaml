@@ -1,12 +1,15 @@
-# ClawHome AI Brain page — shows brain status, last reasoning, alerts
-# Polls ClawHome REST API directly via HTTP
+# ClawHome AI Brain page — shows brain status via HA text_sensors
+# Uses HA input_text/input_number helpers updated by ClawHome
 
 substitutions: !include substitutions.yaml
 
+globals:
+  - id: clawhome_notification_text
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+
 # Physical button (top button on panel, GPIO0)
-# Single click: show brain page
-# Double click: trigger brain cycle
-# Long press (3s): restart device
 binary_sensor:
   - platform: gpio
     id: panel_top_button
@@ -27,13 +30,15 @@ binary_sensor:
               - lvgl.widget.redraw:
               - light.turn_on: display_backlight
         - lvgl.page.show: brain_page
-        - script.execute: fetch_brain_status
     on_double_click:
       min_length: 50ms
       max_length: 400ms
       then:
         - logger.log: "Button: double press — run brain cycle"
-        - script.execute: trigger_brain_cycle
+        - homeassistant.action:
+            action: button.press
+            data:
+              entity_id: button.clawhome_run_brain_cycle
     on_multi_click:
       - timing:
           - ON for at least 3s
@@ -46,248 +51,125 @@ button:
     id: restart_btn
     name: "Restart Panel"
 
-globals:
-  - id: brain_status_text
-    type: std::string
-    restore_value: no
-    initial_value: '"Connecting..."'
-
-  - id: brain_reasoning_text
-    type: std::string
-    restore_value: no
-    initial_value: '"Waiting for data..."'
-
-  - id: brain_cycle_count_val
-    type: int
-    restore_value: no
-    initial_value: '0'
-
-  - id: brain_active_rules_val
-    type: int
-    restore_value: no
-    initial_value: '0'
-
-  - id: brain_pending_rules_val
-    type: int
-    restore_value: no
-    initial_value: '0'
-
-  - id: brain_event_brain_connected
-    type: bool
-    restore_value: no
-    initial_value: 'false'
-
-  - id: clawhome_notification_text
-    type: std::string
-    restore_value: no
-    initial_value: '""'
-
-interval:
-  # Poll ClawHome brain status every 30 seconds
-  - interval: 30s
-    then:
-      - script.execute: fetch_brain_status
-
-  # Poll ClawHome rules every 60 seconds
-  - interval: 60s
-    then:
-      - script.execute: fetch_rules_status
-
-  # Poll notifications every 15 seconds
-  - interval: 15s
-    then:
-      - script.execute: fetch_notifications
-
-script:
-  - id: fetch_notifications
-    then:
-      - http_request.get:
-          url: "${clawhome_url}/api/clawhome/notifications"
-          capture_response: true
-          on_response:
-            then:
-              - lambda: |-
-                  if (response->status_code == 200 && body.length() > 0) {
-                    JsonDocument doc;
-                    DeserializationError error = deserializeJson(doc, body);
-                    if (!error) {
-                      const char* msg = doc["message"];
-                      const char* ts = doc["ts"];
-                      if (msg && strlen(msg) > 0) {
-                        std::string new_msg = msg;
-                        if (new_msg != id(clawhome_notification_text)) {
-                          id(clawhome_notification_text) = new_msg;
-                          lv_label_set_text(id(brain_notification_label), msg);
-                          lv_obj_clear_flag(id(brain_notification_bar), LV_OBJ_FLAG_HIDDEN);
-                          ESP_LOGI("notify", "New notification: %s", msg);
-                        }
-                      } else {
-                        lv_obj_add_flag(id(brain_notification_bar), LV_OBJ_FLAG_HIDDEN);
-                      }
-                    }
-                  }
-
-  - id: fetch_brain_status
-    then:
-      - http_request.get:
-          url: "${clawhome_url}/api/brain/status"
-          capture_response: true
-          on_response:
-            then:
-              - lambda: |-
-                  ESP_LOGI("brain", "HTTP response: %d, body length: %d", response->status_code, body.length());
-                  if (response->status_code == 200 && body.length() > 0) {
-                    JsonDocument doc;
-                    DeserializationError error = deserializeJson(doc, body);
-                    if (error) {
-                      ESP_LOGE("brain", "JSON parse error: %s", error.c_str());
-                      id(brain_status_text) = "PARSE ERR";
-                      id(update_brain_ui).execute();
-                      return;
-                    }
-                    bool enabled = doc["enabled"] | false;
-                    bool running = doc["running"] | false;
-                    int cycles = doc["cycleCount"] | 0;
-                    bool eb_connected = doc["eventBrain"]["connected"] | false;
-
-                    id(brain_event_brain_connected) = eb_connected;
-                    id(brain_cycle_count_val) = cycles;
-
-                    std::string status;
-                    if (!enabled) status = "DISABLED";
-                    else if (running) status = "THINKING";
-                    else status = "IDLE";
-                    id(brain_status_text) = status;
-
-                    const char* reasoning = doc["lastResult"]["reasoning"];
-                    if (reasoning) {
-                      std::string r = reasoning;
-                      if (r.length() > 120) r = r.substr(0, 117) + "...";
-                      id(brain_reasoning_text) = r;
-                    }
-                    ESP_LOGI("brain", "Status: %s, Cycles: %d", status.c_str(), cycles);
-                    id(update_brain_ui).execute();
-                  } else {
-                    ESP_LOGW("brain", "HTTP failed or empty: status=%d", response->status_code);
-                    id(brain_status_text) = "OFFLINE";
-                    id(update_brain_ui).execute();
-                  }
-
-  - id: fetch_rules_status
-    then:
-      - http_request.get:
-          url: "${clawhome_url}/api/rules?status=active"
-          capture_response: true
-          on_response:
-            then:
-              - lambda: |-
-                  if (response->status_code == 200) {
-                    JsonDocument doc;
-                    DeserializationError error = deserializeJson(doc, body);
-                    if (!error && doc.is<JsonArray>()) {
-                      id(brain_active_rules_val) = doc.as<JsonArray>().size();
-                    }
-                  }
-      - http_request.get:
-          url: "${clawhome_url}/api/rules?status=pending_approval"
-          capture_response: true
-          on_response:
-            then:
-              - lambda: |-
-                  if (response->status_code == 200) {
-                    JsonDocument doc;
-                    DeserializationError error = deserializeJson(doc, body);
-                    if (!error && doc.is<JsonArray>()) {
-                      id(brain_pending_rules_val) = doc.as<JsonArray>().size();
-                    }
-                  }
-      - lambda: |-
-          // Update alerts on home page top bar
-          int pending = id(brain_pending_rules_val);
-          if (pending > 0) {
+# HA sensors for brain data
+sensor:
+  - platform: homeassistant
+    id: brain_cycle_count_sensor
+    entity_id: sensor.clawhome_cycle_count
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
             char buf[16];
-            snprintf(buf, sizeof(buf), "%d alert%s", pending, pending > 1 ? "s" : "");
-            lv_label_set_text(id(heating_status), buf);
-          } else {
-            lv_label_set_text(id(heating_status), "");
-          }
-      - script.execute: update_brain_ui
+            snprintf(buf, sizeof(buf), "%.0f", x);
+            lv_label_set_text(id(brain_cycles_value), buf);
 
-  - id: update_brain_ui
-    then:
-      - lambda: |-
-          // Status
-          std::string status = id(brain_status_text);
-          lv_label_set_text(id(brain_status_label), status.c_str());
+  - platform: homeassistant
+    id: brain_active_rules_sensor
+    entity_id: sensor.clawhome_active_rules
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            char buf[32];
+            snprintf(buf, sizeof(buf), "%.0f active", x);
+            lv_label_set_text(id(brain_rules_value), buf);
 
-          // Update home page bottom bar brain status
-          std::string bottom_text = "Brain: " + status;
-          lv_label_set_text(id(bottom_brain_status), bottom_text.c_str());
+  - platform: homeassistant
+    id: brain_pending_rules_sensor
+    entity_id: sensor.clawhome_pending_rules
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            int pending = (int)x;
+            char buf[32];
+            if (pending > 0) {
+              snprintf(buf, sizeof(buf), "%d pending", pending);
+              lv_obj_set_style_text_color(id(brain_pending_value), lv_color_hex(0xf59e0b), 0);
+              // Update home page alerts
+              char alert_buf[16];
+              snprintf(alert_buf, sizeof(alert_buf), "%d alert%s", pending, pending > 1 ? "s" : "");
+              lv_label_set_text(id(heating_status), alert_buf);
+            } else {
+              snprintf(buf, sizeof(buf), "None");
+              lv_obj_set_style_text_color(id(brain_pending_value), lv_color_hex(0x64748b), 0);
+              lv_label_set_text(id(heating_status), "");
+            }
+            lv_label_set_text(id(brain_pending_value), buf);
 
-          // Status color
-          lv_color_t status_color;
-          if (status == "THINKING") {
-            status_color = lv_color_hex(0xf59e0b);  // amber
-          } else if (status == "IDLE") {
-            status_color = lv_color_hex(0x2dd4bf);  // teal
-          } else if (status == "DISABLED") {
-            status_color = lv_color_hex(0x64748b);  // dim
-          } else {
-            status_color = lv_color_hex(0xf43f5e);  // red
-          }
-          lv_obj_set_style_text_color(id(brain_status_label), status_color, 0);
-          lv_obj_set_style_text_color(id(bottom_brain_status), status_color, 0);
+text_sensor:
+  - platform: homeassistant
+    id: brain_status_sensor
+    entity_id: sensor.clawhome_brain_status
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            std::string status = x;
+            // Capitalize for display
+            std::string display_status = status;
+            for (auto &c : display_status) c = toupper(c);
+            lv_label_set_text(id(brain_status_label), display_status.c_str());
 
-          // Reasoning
-          lv_label_set_text(id(brain_reasoning_label), id(brain_reasoning_text).c_str());
+            // Bottom bar
+            std::string bottom = "Brain: " + display_status;
+            lv_label_set_text(id(bottom_brain_status), bottom.c_str());
 
-          // Cycles
-          char cycles_buf[32];
-          snprintf(cycles_buf, sizeof(cycles_buf), "%d", id(brain_cycle_count_val));
-          lv_label_set_text(id(brain_cycles_value), cycles_buf);
+            // Color
+            lv_color_t color;
+            if (status == "thinking") color = lv_color_hex(0xf59e0b);
+            else if (status == "idle") color = lv_color_hex(0x2dd4bf);
+            else if (status == "disabled") color = lv_color_hex(0x64748b);
+            else color = lv_color_hex(0xf43f5e);
+            lv_obj_set_style_text_color(id(brain_status_label), color, 0);
+            lv_obj_set_style_text_color(id(bottom_brain_status), color, 0);
 
-          // Rules
-          char rules_buf[32];
-          snprintf(rules_buf, sizeof(rules_buf), "%d active", id(brain_active_rules_val));
-          lv_label_set_text(id(brain_rules_value), rules_buf);
+  - platform: homeassistant
+    id: brain_reasoning_sensor
+    entity_id: sensor.clawhome_last_reasoning
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            std::string r = x;
+            if (r.length() > 120) r = r.substr(0, 117) + "...";
+            lv_label_set_text(id(brain_reasoning_label), r.c_str());
 
-          // Pending
-          char pending_buf[32];
-          int pending = id(brain_pending_rules_val);
-          if (pending > 0) {
-            snprintf(pending_buf, sizeof(pending_buf), "%d pending", pending);
-            lv_obj_set_style_text_color(id(brain_pending_value), lv_color_hex(0xf59e0b), 0);
-          } else {
-            snprintf(pending_buf, sizeof(pending_buf), "None");
-            lv_obj_set_style_text_color(id(brain_pending_value), lv_color_hex(0x64748b), 0);
-          }
-          lv_label_set_text(id(brain_pending_value), pending_buf);
+  - platform: homeassistant
+    id: brain_event_brain_sensor
+    entity_id: sensor.clawhome_event_brain
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            if (x == "connected") {
+              lv_label_set_text(id(brain_eventbrain_value), "Connected");
+              lv_obj_set_style_text_color(id(brain_eventbrain_value), lv_color_hex(0x22c55e), 0);
+            } else {
+              lv_label_set_text(id(brain_eventbrain_value), "Disconnected");
+              lv_obj_set_style_text_color(id(brain_eventbrain_value), lv_color_hex(0xf43f5e), 0);
+            }
 
-          // Event brain indicator
-          if (id(brain_event_brain_connected)) {
-            lv_label_set_text(id(brain_eventbrain_value), "Connected");
-            lv_obj_set_style_text_color(id(brain_eventbrain_value), lv_color_hex(0x22c55e), 0);
-          } else {
-            lv_label_set_text(id(brain_eventbrain_value), "Disconnected");
-            lv_obj_set_style_text_color(id(brain_eventbrain_value), lv_color_hex(0xf43f5e), 0);
-          }
-
-  - id: trigger_brain_cycle
-    then:
-      - http_request.post:
-          url: "${clawhome_url}/api/brain/status"
-          json:
-            action: "run"
-          on_response:
-            then:
-              - lambda: |-
-                  if (response->status_code == 200) {
-                    id(brain_status_text) = "THINKING";
-                    id(update_brain_ui).execute();
-                  }
-      # Refresh after a delay to get the result
-      - delay: 10s
-      - script.execute: fetch_brain_status
+  # Notifications via HA input_text helper
+  - platform: homeassistant
+    id: clawhome_notification_sensor
+    entity_id: input_text.clawhome_notification
+    internal: true
+    on_value:
+      then:
+        - lambda: |-
+            if (x.length() > 0) {
+              if (x != id(clawhome_notification_text)) {
+                id(clawhome_notification_text) = x;
+                lv_label_set_text(id(brain_notification_label), x.c_str());
+                lv_obj_clear_flag(id(brain_notification_bar), LV_OBJ_FLAG_HIDDEN);
+                ESP_LOGI("notify", "Notification: %s", x.c_str());
+              }
+            } else {
+              id(clawhome_notification_text) = "";
+              lv_obj_add_flag(id(brain_notification_bar), LV_OBJ_FLAG_HIDDEN);
+            }
 
 lvgl:
   pages:
@@ -352,7 +234,10 @@ lvgl:
                         text_color: color_teal
                         text: "\U000F040A"
                   on_click:
-                    - script.execute: trigger_brain_cycle
+                    - homeassistant.action:
+                        action: button.press
+                        data:
+                          entity_id: button.clawhome_run_brain_cycle
 
         # Status card
         - obj:
@@ -366,7 +251,6 @@ lvgl:
             shadow_opa: transp
             clickable: false
             widgets:
-              # Brain icon
               - label:
                   x: 30
                   y: 20
@@ -374,8 +258,6 @@ lvgl:
                   text_font: mdi_icons_52
                   text_color: color_teal
                   text: "\U000F09D1"
-
-              # Status label
               - label:
                   id: brain_status_label
                   x: 105
@@ -383,9 +265,7 @@ lvgl:
                   align: top_left
                   text_font: nunito_36
                   text_color: color_teal
-                  text: "Connecting..."
-
-              # Cycles count
+                  text: "Loading..."
               - label:
                   x: 105
                   y: 68
@@ -393,7 +273,6 @@ lvgl:
                   text_font: nunito_20
                   text_color: color_text_dim
                   text: "Cycles:"
-
               - label:
                   id: brain_cycles_value
                   x: 195
@@ -401,9 +280,7 @@ lvgl:
                   align: top_left
                   text_font: nunito_20
                   text_color: color_text
-                  text: "0"
-
-              # Event brain status
+                  text: "..."
               - label:
                   x: -30
                   y: 68
@@ -411,7 +288,6 @@ lvgl:
                   text_font: nunito_20
                   text_color: color_text_dim
                   text: "Events:"
-
               - label:
                   id: brain_eventbrain_value
                   x: -30
@@ -419,7 +295,7 @@ lvgl:
                   width: 150
                   align: top_right
                   text_font: nunito_20
-                  text_color: color_green
+                  text_color: color_text_dim
                   text_align: right
                   text: "..."
 
@@ -442,7 +318,6 @@ lvgl:
                   text_font: nunito_20
                   text_color: color_text_dim
                   text: "Last Reasoning"
-
               - label:
                   id: brain_reasoning_label
                   x: 30
@@ -453,7 +328,7 @@ lvgl:
                   text_font: nunito_20
                   text_color: color_text
                   long_mode: WRAP
-                  text: "Waiting for data..."
+                  text: "Waiting for HA connection..."
 
         # Rules card
         - obj:
@@ -474,7 +349,6 @@ lvgl:
                   text_font: nunito_20
                   text_color: color_text_dim
                   text: "Smart Rules"
-
               - label:
                   id: brain_rules_value
                   x: 30
@@ -482,8 +356,7 @@ lvgl:
                   align: top_left
                   text_font: nunito_24
                   text_color: color_text
-                  text: "0 active"
-
+                  text: "..."
               - label:
                   x: -30
                   y: 15
@@ -491,7 +364,6 @@ lvgl:
                   text_font: nunito_20
                   text_color: color_text_dim
                   text: "Suggestions"
-
               - label:
                   id: brain_pending_value
                   x: -30
@@ -499,9 +371,9 @@ lvgl:
                   align: top_right
                   text_font: nunito_24
                   text_color: color_text_dim
-                  text: "None"
+                  text: "..."
 
-        # Notification bar (bottom, shows latest ClawHome notification)
+        # Notification bar
         - obj:
             id: brain_notification_bar
             y: 530
@@ -521,7 +393,6 @@ lvgl:
                   text_font: mdi_icons_36
                   text_color: color_amber
                   text: "\U000F0027"
-
               - label:
                   id: brain_notification_label
                   x: 75
