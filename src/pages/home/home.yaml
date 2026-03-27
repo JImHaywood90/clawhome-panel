@@ -1341,7 +1341,7 @@ lvgl:
                   on_click:
                     - lvgl.page.show: brain_page
 
-              # Devices button (right) — tap to open devices
+              # Media player (right) — tap to open media
               - button:
                   id: info_widget_btn
                   clickable: true
@@ -1359,17 +1359,17 @@ lvgl:
                         x: -45
                         align: right_mid
                         text_font: mdi_icons_42
-                        text_color: color_sky
-                        text: "\U000F056E"
+                        text_color: color_green
+                        text: "\U000F040A"
                     - label:
                         x: 0
                         align: right_mid
                         text_font: nunito_20
                         text_color: color_text_dim
                         text_align: right
-                        text: "Devices"
+                        text: "Media"
                   on_click:
-                    - lvgl.page.show: devices_page
+                    - lvgl.page.show: media_player_page
 
         # CIRCLE
         - obj:

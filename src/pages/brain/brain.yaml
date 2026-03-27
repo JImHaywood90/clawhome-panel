@@ -248,6 +248,7 @@ lvgl:
             border_opa: transp
             shadow_opa: transp
             clickable: false
+            scrollable: false
             widgets:
               # Brain icon
               - label:
@@ -286,6 +287,7 @@ lvgl:
             border_opa: transp
             shadow_opa: transp
             clickable: false
+            scrollable: false
             pad_all: 0
             widgets:
               # Cycles card (left)
@@ -298,6 +300,7 @@ lvgl:
                   border_opa: transp
                   shadow_opa: transp
                   clickable: false
+                  scrollable: false
                   widgets:
                     - label:
                         x: 20
@@ -326,6 +329,7 @@ lvgl:
                   border_opa: transp
                   shadow_opa: transp
                   clickable: false
+                  scrollable: false
                   widgets:
                     - label:
                         x: 20
@@ -355,6 +359,7 @@ lvgl:
             border_opa: transp
             shadow_opa: transp
             clickable: false
+            scrollable: false
             widgets:
               - label:
                   x: 25
@@ -382,6 +387,7 @@ lvgl:
             border_opa: transp
             shadow_opa: transp
             clickable: false
+            scrollable: false
             widgets:
               - label:
                   x: 25
@@ -414,6 +420,7 @@ lvgl:
             border_opa: transp
             shadow_opa: transp
             clickable: false
+            scrollable: false
             hidden: true
             widgets:
               - label:

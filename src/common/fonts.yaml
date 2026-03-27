@@ -391,6 +391,9 @@
     "\U000F0467", # rotate right
     "\U000F1C91", # swing on
     "\U000F1C92", # swing off
+    "\U000F09D1", # brain/smart
+    "\U000F004D", # arrow left (back)
+    "\U000F0027", # alert/bell
   ]
 
 
