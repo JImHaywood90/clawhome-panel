@@ -168,6 +168,7 @@ micro_wake_word:
   id: my_wake_word
   models:
     - model: alexa
+    - model: hey_jarvis
   on_wake_word_detected:
     then:
       - logger.log: "Wake word detected"
