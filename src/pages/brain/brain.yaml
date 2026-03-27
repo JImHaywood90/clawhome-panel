@@ -102,39 +102,40 @@ script:
           on_response:
             then:
               - lambda: |-
-                  if (response->status_code == 200) {
+                  ESP_LOGI("brain", "HTTP response: %d, body length: %d", response->status_code, body.length());
+                  if (response->status_code == 200 && body.length() > 0) {
                     JsonDocument doc;
                     DeserializationError error = deserializeJson(doc, body);
-                    if (!error) {
-                      // Brain enabled/running state
-                      bool enabled = doc["enabled"] | false;
-                      bool running = doc["running"] | false;
-                      int cycles = doc["cycleCount"] | 0;
-
-                      // Event brain
-                      bool eb_connected = doc["eventBrain"]["connected"] | false;
-                      id(brain_event_brain_connected) = eb_connected;
-                      id(brain_cycle_count_val) = cycles;
-
-                      // Derive status
-                      std::string status;
-                      if (!enabled) status = "DISABLED";
-                      else if (running) status = "THINKING";
-                      else status = "IDLE";
-                      id(brain_status_text) = status;
-
-                      // Last reasoning
-                      const char* reasoning = doc["lastResult"]["reasoning"];
-                      if (reasoning) {
-                        std::string r = reasoning;
-                        if (r.length() > 120) r = r.substr(0, 117) + "...";
-                        id(brain_reasoning_text) = r;
-                      }
-
-                      // Update UI
+                    if (error) {
+                      ESP_LOGE("brain", "JSON parse error: %s", error.c_str());
+                      id(brain_status_text) = "PARSE ERR";
                       id(update_brain_ui).execute();
+                      return;
                     }
+                    bool enabled = doc["enabled"] | false;
+                    bool running = doc["running"] | false;
+                    int cycles = doc["cycleCount"] | 0;
+                    bool eb_connected = doc["eventBrain"]["connected"] | false;
+
+                    id(brain_event_brain_connected) = eb_connected;
+                    id(brain_cycle_count_val) = cycles;
+
+                    std::string status;
+                    if (!enabled) status = "DISABLED";
+                    else if (running) status = "THINKING";
+                    else status = "IDLE";
+                    id(brain_status_text) = status;
+
+                    const char* reasoning = doc["lastResult"]["reasoning"];
+                    if (reasoning) {
+                      std::string r = reasoning;
+                      if (r.length() > 120) r = r.substr(0, 117) + "...";
+                      id(brain_reasoning_text) = r;
+                    }
+                    ESP_LOGI("brain", "Status: %s, Cycles: %d", status.c_str(), cycles);
+                    id(update_brain_ui).execute();
                   } else {
+                    ESP_LOGW("brain", "HTTP failed or empty: status=%d", response->status_code);
                     id(brain_status_text) = "OFFLINE";
                     id(update_brain_ui).execute();
                   }

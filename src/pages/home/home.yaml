@@ -391,6 +391,10 @@ lvgl:
         - script.execute:
             id: switch_to_mode
             target_mode: 1
+      on_swipe_right:
+        - script.execute:
+            id: switch_to_mode
+            target_mode: 0
       widgets:
         # indicators — ClawHome simplified
         - obj:
@@ -1355,9 +1359,9 @@ lvgl:
                     - label:
                         x: -45
                         align: right_mid
-                        text_font: mdi_icons_36
+                        text_font: mdi_icons_42
                         text_color: color_sky
-                        text: "${dashboard_icon}"
+                        text: "\U000F056E"
                     - label:
                         x: 0
                         align: right_mid
@@ -1365,6 +1369,8 @@ lvgl:
                         text_color: color_text_dim
                         text_align: right
                         text: "Devices"
+                  on_click:
+                    - lvgl.page.show: devices_page
 
         # CIRCLE
         - obj:
