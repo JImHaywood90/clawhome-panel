@@ -175,5 +175,3 @@ lvgl:
                         text: "AI Brain"
                   on_click:
                     - lvgl.page.show: brain_page
-                    - script.execute: fetch_brain_status
-                    - script.execute: fetch_rules_status
