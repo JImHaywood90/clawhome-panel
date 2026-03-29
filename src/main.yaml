@@ -1,18 +1,18 @@
 packages:
-  audio: !include services/audio.yaml
-  loading: !include common/pages/loading.yaml
-  home: !include pages/home/home.yaml
-  light: !include pages/light/config.yaml
-  devices: !include common/pages/devices.yaml
-  climate: !include pages/climate/climate.yaml
-  cover: !include pages/cover/config.yaml
-  media_player: !include pages/media_player/media_player.yaml
-  brain: !include pages/brain/brain.yaml
+  audio: !include clawhome-panel/services/audio.yaml
+  loading: !include clawhome-panel/common/pages/loading.yaml
+  home: !include clawhome-panel/pages/home/home.yaml
+  light: !include clawhome-panel/pages/light/config.yaml
+  devices: !include clawhome-panel/common/pages/devices.yaml
+  climate: !include clawhome-panel/pages/climate/climate.yaml
+  cover: !include clawhome-panel/pages/cover/config.yaml
+  media_player: !include clawhome-panel/pages/media_player/media_player.yaml
+  brain: !include clawhome-panel/pages/brain/brain.yaml
 
-image: !include common/images.yaml
-font: !include common/fonts.yaml
-color: !include common/colors.yaml
-substitutions: !include common/substitutions.yaml
+image: !include clawhome-panel/common/images.yaml
+font: !include clawhome-panel/common/fonts.yaml
+color: !include clawhome-panel/common/colors.yaml
+substitutions: !include clawhome-panel/common/substitutions.yaml
 
 esphome:
   name: ${name}
@@ -30,6 +30,12 @@ esphome:
         - lvgl.roller.update:
             id: backlight_settings_sleep_time_roller
             selected_index: !lambda return id(display_timeout);
+
+globals:
+  - id: screensaver_active
+    type: bool
+    restore_value: no
+    initial_value: 'false'
 
 esp32:
   board: esp32-p4-evboard
@@ -123,6 +129,18 @@ touchscreen:
             - lvgl.resume:
             - lvgl.widget.redraw:
             - light.turn_on: display_backlight
+      - if:
+          condition:
+            lambda: 'return id(screensaver_active);'
+          then:
+            - logger.log: "Waking from screensaver"
+            - globals.set:
+                id: screensaver_active
+                value: 'false'
+            - lvgl.page.show: home_page
+            - light.turn_on:
+                id: display_backlight
+                brightness: 100%
 
 output:
   - platform: ledc
@@ -272,6 +290,25 @@ lvgl:
                 bg_color: color_steel_blue
                 indicator:
                   bg_color: color_misty_blue
+      - obj:
+          id: voice_indicator
+          hidden: true
+          y: 30
+          width: 250
+          height: 50
+          align: top_mid
+          radius: 25
+          bg_color: 0x0f172a
+          border_color: 0x2dd4bf
+          border_width: 2
+          shadow_opa: transp
+          widgets:
+            - label:
+                id: voice_indicator_label
+                align: center
+                text_font: nunito_24
+                text_color: 0x2dd4bf
+                text: "Listening..."
 
 
 http_request:
