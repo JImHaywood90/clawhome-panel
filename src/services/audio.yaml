@@ -172,6 +172,24 @@ micro_wake_word:
   on_wake_word_detected:
     then:
       - logger.log: "Wake word detected"
+      - if:
+          condition: lvgl.is_paused
+          then:
+            - lvgl.resume:
+            - light.turn_on: display_backlight
+      - if:
+          condition:
+            lambda: 'return lv_scr_act() == id(screensaver_page);'
+          then:
+            - lvgl.page.show: home_page
+            - light.turn_on:
+                id: display_backlight
+                brightness: 100%
+      - lvgl.widget.show: voice_indicator
+      - lvgl.label.update:
+          id: voice_indicator_label
+          text: "Listening..."
+          text_color: 0x2dd4bf
       - voice_assistant.start:
           wake_word: !lambda return wake_word;
 
@@ -184,7 +202,27 @@ voice_assistant:
   auto_gain: 31dBFS
   volume_multiplier: 2.0
   conversation_timeout: 300s
+  on_listening:
+    - logger.log: "Voice: listening"
+    - lvgl.widget.show: voice_indicator
+    - lvgl.label.update:
+        id: voice_indicator_label
+        text: "Listening..."
+        text_color: 0x2dd4bf
+  on_stt_end:
+    - logger.log: "Voice: processing"
+    - lvgl.label.update:
+        id: voice_indicator_label
+        text: "Processing..."
+        text_color: 0xf59e0b
+  on_tts_start:
+    - logger.log: "Voice: responding"
+    - lvgl.label.update:
+        id: voice_indicator_label
+        text: "Speaking..."
+        text_color: 0x22c55e
   on_end:
+    - lvgl.widget.hide: voice_indicator
     # Wait a short amount of time to see if an announcement starts
     - wait_until:
         condition:

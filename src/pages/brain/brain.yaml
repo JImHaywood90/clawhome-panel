@@ -50,6 +50,44 @@ button:
     id: restart_btn
     name: "Restart Panel"
 
+# Page selector — controllable from HA to switch display pages
+select:
+  - platform: template
+    id: panel_page_select
+    name: "Panel Page"
+    optimistic: true
+    options:
+      - "home"
+      - "lights"
+      - "brain"
+      - "climate"
+      - "screensaver"
+      - "devices"
+    initial_option: "home"
+    on_value:
+      then:
+        - logger.log:
+            format: "Page switch: %s"
+            args: ['x.c_str()']
+        - if:
+            condition: lvgl.is_paused
+            then:
+              - lvgl.resume:
+              - lvgl.widget.redraw:
+        - light.turn_on:
+            id: display_backlight
+            brightness: 100%
+        - lambda: |-
+            std::string page = x;
+            if (page == "home") lv_disp_load_scr(id(home_page));
+            else if (page == "brain") lv_disp_load_scr(id(brain_page));
+            else if (page == "climate") lv_disp_load_scr(id(climate_page));
+            else if (page == "devices") lv_disp_load_scr(id(devices_page));
+            else if (page == "screensaver") lv_disp_load_scr(id(screensaver_page));
+            else if (page == "lights") {
+              id(switch_to_room_1).execute();
+            }
+
 # HA sensors for brain data
 sensor:
   - platform: homeassistant

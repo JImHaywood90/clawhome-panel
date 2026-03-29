@@ -151,6 +151,15 @@ touchscreen:
             - lvgl.resume:
             - lvgl.widget.redraw:
             - light.turn_on: display_backlight
+      - if:
+          condition:
+            lambda: 'return lv_scr_act() == id(screensaver_page);'
+          then:
+            - logger.log: "Waking from screensaver"
+            - lvgl.page.show: home_page
+            - light.turn_on:
+                id: display_backlight
+                brightness: 100%
 
 output:
   - platform: ledc
@@ -306,6 +315,25 @@ lvgl:
                 bg_color: color_steel_blue
                 indicator:
                   bg_color: color_misty_blue
+      - obj:
+          id: voice_indicator
+          hidden: true
+          y: 30
+          width: 250
+          height: 50
+          align: top_mid
+          radius: 25
+          bg_color: 0x0f172a
+          border_color: 0x2dd4bf
+          border_width: 2
+          shadow_opa: transp
+          widgets:
+            - label:
+                id: voice_indicator_label
+                align: center
+                text_font: nunito_24
+                text_color: 0x2dd4bf
+                text: "Listening..."
 
 
 http_request:
