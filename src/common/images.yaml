@@ -14,17 +14,6 @@
 #   transparency: alpha_channel
 
   #############################
-  ########## VACUUM ###########
-  #############################
-
-
-
-  #############################
-  ########### FAN #############
-  #############################
-
-
-  #############################
   ########## WEATHER ##########
   #############################
 
@@ -245,18 +234,6 @@
   resize: 75x75  # 50x50 * 1.5
   byte_order: little_endian
   transparency: alpha_channel
-
-  #############################
-  ########## FLAGS ############
-  #############################
-
-- file: 'clawhome-panel/assets/images/flags/gb.png'
-  id: flags_gb_img
-  type: rgb565
-  resize: 60x90  # 40x60 * 1.5
-  byte_order: little_endian
-  transparency: alpha_channel
-
 
   #############################
   ########## BATTERY ##########

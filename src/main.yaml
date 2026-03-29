@@ -14,44 +14,16 @@ font: !include common/fonts.yaml
 color: !include common/colors.yaml
 substitutions: !include common/substitutions.yaml
 
-external_components:
-
-  - source: github://alaltitov/esphome@dev
-    components: [i18n]
-    refresh: 1h
-
-
-i18n:
-  id: i18n_translations
-  sources:
-    - translations/en.yaml
-    - translations/es.yaml
-    - translations/fr.yaml
-    - translations/nl.yaml
-    - translations/pl.yaml
-    - translations/ru.yaml
-    - translations/si.yaml
-    - translations/it.yaml
-    - translations/de.yaml
-  default_locale: en
-
-
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   name_add_mac_suffix: false
-  platformio_options:
-    lib_deps:
-      - "bblanchon/ArduinoJson@^7.2.0"
   includes:
     - <sstream>
     - <algorithm>
-    - <ArduinoJson.h>
   on_boot:
     - priority: 400
       then:
-        - lambda: |-
-            id(i18n_translations).set_current_locale(id(current_language));
         - script.execute: update_loading_page
     - priority: -100
       then:
@@ -151,15 +123,6 @@ touchscreen:
             - lvgl.resume:
             - lvgl.widget.redraw:
             - light.turn_on: display_backlight
-      - if:
-          condition:
-            lambda: 'return lv_scr_act() == id(screensaver_page);'
-          then:
-            - logger.log: "Waking from screensaver"
-            - lvgl.page.show: home_page
-            - light.turn_on:
-                id: display_backlight
-                brightness: 100%
 
 output:
   - platform: ledc
@@ -207,12 +170,10 @@ ota:
       - lvgl.widget.redraw:
       - lvgl.label.update:
           id: ota_label_primary
-          text: !lambda |-
-            return id(i18n_translations).translate("ota.start.primary");
+          text: "OTA Update"
       - lvgl.label.update:
           id: ota_label_secondary
-          text: !lambda |-
-            return id(i18n_translations).translate("ota.start.secondary");
+          text: "Starting..."
       - lvgl.widget.show: ota_widget
       - lvgl.resume:
       - lvgl.widget.redraw:
@@ -231,7 +192,7 @@ ota:
           id: ota_label_secondary
           text: !lambda |-
             static char buffer[64];
-            snprintf(buffer, sizeof(buffer), id(i18n_translations).translate("ota.progress").c_str(), x);
+            snprintf(buffer, sizeof(buffer), "Progress: %d%%", (int)x);
             return buffer;
       - lambda: "id(lvgl_component).loop();"
 
@@ -242,12 +203,10 @@ ota:
           value: 100
       - lvgl.label.update:
           id: ota_label_primary
-          text: !lambda |-
-            return id(i18n_translations).translate("ota.end.primary");
+          text: "Update Complete"
       - lvgl.label.update:
           id: ota_label_secondary
-          text: !lambda |-
-            return id(i18n_translations).translate("ota.end.secondary");
+          text: "Restarting..."
       - lambda: |-
           id(lvgl_component).loop();
 
@@ -257,12 +216,10 @@ ota:
             args: ["x"]
       - lvgl.label.update:
           id: ota_label_primary
-          text: !lambda |-
-            return id(i18n_translations).translate("ota.error.primary");
+          text: "Update Failed"
       - lvgl.label.update:
           id: ota_label_secondary
-          text: !lambda |-
-            return id(i18n_translations).translate("ota.error.secondary");
+          text: "Please try again"
       - lambda: |-
           id(lvgl_component).loop();
 
@@ -315,25 +272,6 @@ lvgl:
                 bg_color: color_steel_blue
                 indicator:
                   bg_color: color_misty_blue
-      - obj:
-          id: voice_indicator
-          hidden: true
-          y: 30
-          width: 250
-          height: 50
-          align: top_mid
-          radius: 25
-          bg_color: 0x0f172a
-          border_color: 0x2dd4bf
-          border_width: 2
-          shadow_opa: transp
-          widgets:
-            - label:
-                id: voice_indicator_label
-                align: center
-                text_font: nunito_24
-                text_color: 0x2dd4bf
-                text: "Listening..."
 
 
 http_request:

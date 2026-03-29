@@ -1,14 +1,6 @@
 # TEXT FONT
 
 - file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
-  id: nunito_16
-  size: 16
-  bpp: 4
-  glyphsets:
-    - GF_Latin_Core
-    - GF_Cyrillic_Core
-
-- file: "clawhome-panel/assets/fonts/Nunito-SemiBold.ttf"
   id: nunito_18
   size: 18
   bpp: 4
@@ -163,20 +155,6 @@
   ]
 
 - file: "clawhome-panel/assets/fonts/icons_v2.ttf"
-  id: icons_32
-  size: 32
-  bpp: 4
-  glyphs: [
-    "\U0000e91f", # arrow_up
-    "\U0000e920", # arrow_down
-    "\U0000e91c", # stop
-    "\U0000e90e", # volume_off
-    "\U0000e90f", # volume_on
-    "\U0000e910", # volume_minus
-    "\U0000e911", # volume_plus
-  ]
-
-- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
   id: icons_36
   size: 36
   bpp: 4
@@ -199,24 +177,6 @@
     "\U0000e933", # wifi signal from 75% to 50%
     "\U0000e934", # wifi signal from 100% to 75% or disable
     "\U0000e938", # humidity
-  ]
-
-- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
-  id: icons_38
-  size: 38
-  bpp: 4
-  glyphs: [
-    "\U0000e909", # power
-    "\U0000e90c", # back step
-    "\U0000e90d", # forward step
-    "\U0000e912", # repeat_all
-    "\U0000e913", # repeat_off
-    "\U0000e914", # repeat_one
-    "\U0000e90a", # play
-    "\U0000e90b", # pause
-    "\U0000e91c", # stop
-    "\U0000e923", # locate
-    "\U0000e924", # docked
   ]
 
 - file: "clawhome-panel/assets/fonts/icons_v2.ttf"
@@ -249,35 +209,6 @@
     "\U0000e93b", # air_conditioner
     "\U0000e938", # humidity
     "\U0000e939", # temperature 
-  ]
-
-- file: "clawhome-panel/assets/fonts/icons_v2.ttf"
-  id: icons_90
-  size: 90
-  bpp: 4
-  glyphs: [
-    "\U0000e908", # lightbulb
-    "\U0000e915", # spotlights_group
-    "\U0000e916", # desk_lamp
-    "\U0000e917", # pendant_lamp
-    "\U0000e918", # ceiling_lamp
-    "\U0000e921", # ceiling_lamp_variant
-    "\U0000e919", # night_lamp
-    "\U0000e91d", # 0 - shutter_closed
-    "\U0000e93d", # 10 - shutter
-    "\U0000e93e", # 20 - shutter
-    "\U0000e93f", # 30 - shutter
-    "\U0000e940", # 40 - shutter
-    "\U0000e941", # 50 - shutter
-    "\U0000e93c", # 60 - shutter
-    "\U0000e943", # 70 - shutter
-    "\U0000e944", # 80 - shutter
-    "\U0000e942", # 90 - shutter
-    "\U0000e91e",  # 100 - shutter_open
-    "\U0000e91b", # music
-    "\U0000e91f", # arrow_up
-    "\U0000e920", # arrow_down
-    "\U0000e922", # vacuum
   ]
 
 # iCONS FONT

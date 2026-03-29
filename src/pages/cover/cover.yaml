@@ -480,4 +480,4 @@ script:
       - lvgl.label.update:
           id: ${widget_name}_cover_state_label
           text: !lambda |-
-            return id(i18n_translations).translate(("cover.state." + id(${widget_name}_state_sensor).state));
+            return id(${widget_name}_state_sensor).state;

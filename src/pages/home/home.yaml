@@ -42,11 +42,6 @@ globals:
     type: std::string[15]
 
 
-  - id: current_language
-    type: std::string
-    initial_value: '"${secondary_language}"'
-    restore_value: yes
-
   - id: current_mode
     type: int
     initial_value: '0'  # 0=HOME, 1=WEATHER, 2=INFO, 3=SETTINGS
@@ -72,38 +67,6 @@ number:
 
 
 switch:
-  - platform: lvgl
-    name: "Your language"
-    id: language_switch
-    widget: circle_settings_widget_lang_btn
-    restore_mode: RESTORE_DEFAULT_ON
-    on_turn_on:
-      - i18n.set_locale:
-          locale: "${secondary_language}"
-      - lambda: |-
-          id(current_language) = "${secondary_language}";
-          ESP_LOGI("TEST", "Current locale i18n: %s", id(i18n_translations).get_current_locale().c_str());
-          ESP_LOGI("TEST", "Current locale global: %s", id(current_language).c_str());
-      - lvgl.image.update:
-          id: circle_settings_widget_lang_flag
-          src: !lambda return id(flag_icon_mapping).get(id(i18n_translations).get_current_locale());
-      - script.execute: time_update
-      - script.execute: update_home_translations
-      # - script.execute: update_loading_page
-    on_turn_off:
-      - i18n.set_locale:
-          locale: "en"
-      - lambda: |-
-          id(current_language) = "en";
-          ESP_LOGI("TEST", "Current locale i18n: %s", id(i18n_translations).get_current_locale().c_str());
-          ESP_LOGI("TEST", "Current locale global: %s", id(current_language).c_str());
-      - lvgl.image.update:
-          id: circle_settings_widget_lang_flag
-          src: !lambda return id(flag_icon_mapping).get(id(i18n_translations).get_current_locale());
-      - script.execute: time_update
-      - script.execute: update_home_translations
-      # - script.execute: update_loading_page
-
   - platform: lvgl
     name: "LVGL lock"
     id: display_lock_switch
@@ -1569,20 +1532,17 @@ lvgl:
                         height: 150
                         pad_all: 0
                         align: center
-                        clickable: true
+                        clickable: false
                         radius: 75
                         border_opa: transp
                         bg_opa: transp
                         shadow_opa: transp
-                        checked:
-                          bg_opa: transp
                         widgets:
-                          - image:
-                              id: circle_settings_widget_lang_flag
+                          - label:
                               align: center
-                              src: flags_gb_img
-                        on_click:
-                          - switch.toggle: language_switch
+                              text_font: mdi_icons_52
+                              text_color: color_misty_blue
+                              text: "\U000F0493"
 
     - id: screensaver_page
       bg_color: color_bg
@@ -1611,13 +1571,6 @@ lvgl:
             text: "18°C"
 
 
-mapping:
-  - id: flag_icon_mapping
-    from: string
-    to: image
-    entries:
-      en: flags_gb_img
-
 script:
 
   - id: update_home_translations
@@ -1625,44 +1578,19 @@ script:
       - lvgl.label.update:
           id: weather_state_label
           text: !lambda |-
-            return id(i18n_translations).translate(("weather." + id(weather_state_sensor).state));
+            return id(weather_state_sensor).state;
       - lvgl.label.update:
           id: backlight_settings_brightness_label
-          text: !lambda |-
-            return id(i18n_translations).translate("settings.backlight");
+          text: "Backlight"
       - lvgl.label.update:
           id: backlight_settings_sleep_time_label
-          text: !lambda |-
-            return id(i18n_translations).translate("settings.sleep_time");
+          text: "Sleep Time"
       - lvgl.label.update:
           id: weather_forecast_daily_label
-          text: !lambda |-
-            return id(i18n_translations).translate("forecasts.daily");
+          text: "Daily"
       - lvgl.label.update:
           id: weather_forecast_hourly_label
-          text: !lambda |-
-            return id(i18n_translations).translate("forecasts.hourly");
-
-      - lambda: |-
-          lv_obj_t *roller_obj = id(backlight_settings_sleep_time_roller).obj;
-          if (roller_obj == nullptr) {
-            return;
-          }
-
-          uint16_t old_selection = lv_roller_get_selected(roller_obj);
-
-          std::string options = 
-            id(i18n_translations).translate("sleep_time.never") + "\n" +
-            id(i18n_translations).translate("sleep_time.minute1") + "\n" +
-            id(i18n_translations).translate("sleep_time.minute5") + "\n" +
-            id(i18n_translations).translate("sleep_time.minute10") + "\n" +
-            id(i18n_translations).translate("sleep_time.minute30") + "\n" +
-            id(i18n_translations).translate("sleep_time.hour1") + "\n" +
-            id(i18n_translations).translate("sleep_time.hour6") + "\n" +
-            id(i18n_translations).translate("sleep_time.hour12");
-
-          lv_roller_set_options(roller_obj, options.c_str(), LV_ROLLER_MODE_NORMAL);
-          lv_roller_set_selected(roller_obj, old_selection, LV_ANIM_OFF);
+          text: "Hourly"
 
   # - id: display_block_buttons
   #   then:
@@ -1820,193 +1748,9 @@ script:
             else show(id(weather_sunny_image));
           }
 
-  - id: log_widgets_status
-    then:
-      - lambda: |-
-          // Создаем список пар: указатель на виджет и его имя
-          auto widget_list = {
-              std::make_pair(id(main_widget_background), "main_widget_background"),
-              std::make_pair(id(weather_time_widget), "weather_time_widget"),
-              std::make_pair(id(datetime_widget), "datetime_widget"),
-              std::make_pair(id(weather_widget), "weather_widget"),
-              std::make_pair(id(info_widget), "info_widget"),
-              std::make_pair(id(settings_widget), "settings_widget"),
-              std::make_pair(id(weather_state_images), "weather_state_images"),
-              std::make_pair(id(middle_weather_controls), "middle_weather_controls"),
-              std::make_pair(id(weather_forecast_daily), "weather_forecast_daily"),
-              std::make_pair(id(weather_forecast_hourly), "weather_forecast_hourly"),
-              std::make_pair(id(circle_home_widget), "circle_home_widget"),
-              std::make_pair(id(circle_info_widget), "circle_info_widget"),
-              std::make_pair(id(circle_settings_widget), "circle_settings_widget")
-          };
-
-          for (auto& item : widget_list) {
-              auto* widget = item.first;
-              const char* name = item.second;
-              if (widget != nullptr) {
-                  bool is_hidden = lv_obj_has_flag(widget, LV_OBJ_FLAG_HIDDEN);
-                  lv_style_value_t val = lv_obj_get_style_prop(widget, LV_PART_MAIN, LV_STYLE_OPA);
-                  lv_opa_t opa_value = val.num;
-
-                  ESP_LOGD("Widget Status", "ID: %s -> Hidden: %s, Opa: %d", 
-                          name, 
-                          is_hidden ? "true" : "false", 
-                          opa_value);
-              } else {
-                  ESP_LOGD("Widget Status", "Ошибка: виджет %s не найден (указатель nullptr).", name);
-              }
-          }
 
 
 
-
-
-
-
-
-##### TESTS #####
-  - id: run_random_mode_tests
-    then:
-      - lambda: |-
-          ESP_LOGI("TEST", "Random mode test started");
-      - repeat:
-          count: 30
-          then:
-            - lambda: |-
-                // Выбираем случайный целевой режим (0..3), не равный текущему
-                int current = id(current_mode);
-                int target = current;
-                int attempts = 0;
-                while (target == current && attempts < 10) {
-                  target = (int)(esp_random() % 4);
-                  attempts++;
-                }
-                ESP_LOGI("TEST", "Switch %d -> %d", current, target);
-                id(switch_to_mode)->execute(target);
-            - wait_until:
-                condition: 
-                  lambda: 'return !id(is_animating);'
-                timeout: 3s
-            # Небольшая пауза после окончания анимации, чтобы стили успели примениться
-            - delay: 60ms
-            - script.execute: validate_mode_state
-      - lambda: |-
-          ESP_LOGI("TEST", "Random mode test finished");
-
-  - id: validate_mode_state
-    then:
-      - lambda: |-
-          auto is_visible = [](lv_obj_t* w)->bool{
-            if (!w) return false;
-            bool hidden = lv_obj_has_flag(w, LV_OBJ_FLAG_HIDDEN);
-            if (hidden) return false;
-            lv_style_value_t val = lv_obj_get_style_prop(w, LV_PART_MAIN, LV_STYLE_OPA);
-            lv_opa_t opa_value = val.num;
-            return opa_value > 0; // считаем видимым при любой ненулевой непрозрачности
-          };
-
-          int m = id(current_mode);
-          bool ok = true;
-
-          // Если режим HOME, дайте стилистике чуть больше времени стабилизироваться
-          if (m == 0) {
-            // небольшой локальный sleep без блокировки LVGL (если доступно)
-            // иначе просто ничего: LVGL уже в основном потоке.
-          }
-
-          // Должны быть видимы
-          std::vector<std::pair<lv_obj_t*, const char*>> must;
-
-          if (m == 0) { // HOME
-            must = {
-              { id(main_widget_background), "main_widget_background" },
-              { id(weather_time_widget), "weather_time_widget" },
-              { id(datetime_widget), "datetime_widget" },
-              { id(weather_state_images), "weather_state_images" },
-              { id(circle_home_widget), "circle_home_widget" },
-            };
-          } else if (m == 1) { // WEATHER
-            must = {
-              { id(main_widget_background), "main_widget_background" },
-              { id(weather_time_widget), "weather_time_widget" },
-              { id(weather_widget), "weather_widget" },
-              { id(weather_state_images), "weather_state_images" },
-              { id(middle_weather_controls), "middle_weather_controls" },
-            };
-          } else if (m == 2) { // INFO
-            must = {
-              { id(main_widget_background), "main_widget_background" },
-              { id(info_widget), "info_widget" },
-              { id(circle_info_widget), "circle_info_widget" },
-            };
-          } else if (m == 3) { // SETTINGS
-            must = {
-              { id(main_widget_background), "main_widget_background" },
-              { id(settings_widget), "settings_widget" },
-              { id(circle_settings_widget), "circle_settings_widget" },
-            };
-          }
-
-          for (auto &p : must) {
-            bool vis = is_visible(p.first);
-            if (!vis) {
-              ok = false;
-              ESP_LOGE("VALIDATE", "VISIBLE expected but not: %s", p.second);
-            }
-          }
-
-          // Проверка «лишние» скрыты (или opa=0)
-          auto soft_hidden = [&](lv_obj_t* w)->bool{
-            if (!w) return true;
-            bool hidden = lv_obj_has_flag(w, LV_OBJ_FLAG_HIDDEN);
-            if (hidden) return true;
-            lv_style_value_t val = lv_obj_get_style_prop(w, LV_PART_MAIN, LV_STYLE_OPA);
-            lv_opa_t opa_value = val.num;
-            return opa_value == 0;
-          };
-
-          // Карта всех контролируемых
-          std::vector<std::pair<lv_obj_t*, const char*>> all = {
-            { id(main_widget_background), "main_widget_background" },
-            { id(weather_time_widget), "weather_time_widget" },
-            { id(datetime_widget), "datetime_widget" },
-            { id(weather_widget), "weather_widget" },
-            { id(info_widget), "info_widget" },
-            { id(settings_widget), "settings_widget" },
-            { id(weather_state_images), "weather_state_images" },
-            { id(middle_weather_controls), "middle_weather_controls" },
-            { id(circle_home_widget), "circle_home_widget" },
-            { id(circle_info_widget), "circle_info_widget" },
-            { id(circle_settings_widget), "circle_settings_widget" },
-          };
-
-          auto is_must = [&](lv_obj_t* w)->bool{
-            for (auto &p : must) if (p.first == w) return true;
-            return false;
-          };
-
-          for (auto &p : all) {
-            if (is_must(p.first)) continue; // уже проверен как видимый
-
-            // В режимах INFO (2) и SETTINGS (3) НЕ требуем скрывать weather_state_images — он может «уезжать»
-            if ((m == 2 || m == 3) && p.first == id(weather_state_images)) {
-              continue;
-            }
-
-            // В режиме WEATHER (1) не требуем скрывать circle_home_widget (он может быть видим как декоративный элемент)
-            if (m == 1 && p.first == id(circle_home_widget)) {
-              continue;
-            }
-
-            // остальное должно быть скрыто или прозрачно
-            if (!soft_hidden(p.first)) {
-              ok = false;
-              ESP_LOGE("VALIDATE", "Should be hidden/transparent: %s", p.second);
-            }
-          }
-
-          if (ok) ESP_LOGI("VALIDATE", "Mode %d: OK", m);
-          else    ESP_LOGE("VALIDATE", "Mode %d: FAILED", m);
 
 
 ###########################
@@ -2028,22 +1772,19 @@ script:
           id: day_of_week_value
           text: !lambda |-
             auto now = id(sntp_time).now();
-            const char* day_keys[] = {"day_of_week.sunday", "day_of_week.monday", "day_of_week.tuesday", "day_of_week.wednesday", 
-                                      "day_of_week.thursday", "day_of_week.friday", "day_of_week.saturday"};
-            const char* day_key = day_keys[now.day_of_week - 1];
-            
-            return id(i18n_translations).translate(day_key);
+            const char* days[] = {"Sunday", "Monday", "Tuesday", "Wednesday",
+                                  "Thursday", "Friday", "Saturday"};
+            return days[now.day_of_week - 1];
 
       - lvgl.label.update:
           id: date_month_value
           text: !lambda |-
             auto now = id(sntp_time).now();
-            const char* month_keys[] = {"month.january", "month.february", "month.march", "month.april", "month.may", "month.june", 
-                                        "month.july", "month.august", "month.september", "month.october", "month.november", "month.december"};
-            const char* month_key = month_keys[now.month - 1];
-            
+            const char* months[] = {"January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"};
+
             static char buf[64];
-            snprintf(buf, sizeof(buf), "%02d %s", now.day_of_month, id(i18n_translations).translate(month_key).c_str());
+            snprintf(buf, sizeof(buf), "%02d %s", now.day_of_month, months[now.month - 1]);
             return buf;
 
 
@@ -2349,18 +2090,13 @@ script:
             auto time_now = id(sntp_time).now();
             int today_wday = time_now.day_of_week;
             int forecast_wday = (today_wday + index - 1) % 7 + 1;
-            
-            const char* day_keys[] = {
-              "", "day_of_week_short.sunday", "day_of_week_short.monday",
-              "day_of_week_short.tuesday", "day_of_week_short.wednesday",
-              "day_of_week_short.thursday", "day_of_week_short.friday",
-              "day_of_week_short.saturday"
+
+            const char* days[] = {
+              "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
             };
-            
+
             if (forecast_wday < 1 || forecast_wday > 7) return "???";
-            static std::string result;
-            result = id(i18n_translations).translate(day_keys[forecast_wday]);
-            return result.c_str();
+            return days[forecast_wday];
           };
           
           lv_obj_t* cont = lv_obj_create(id(weather_forecast_daily));
@@ -2532,48 +2268,4 @@ script:
           
           ESP_LOGI("weather", "✅ Created %d hourly items with scroll", id(forecast_hourly_count));
 
-  - id: test_timezone
-    then:
-      - lambda: |-
-          ESP_LOGI("TZ_TEST", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-          
-          // System timezone
-          char* tz_env = getenv("TZ");
-          ESP_LOGI("TZ_TEST", "System TZ env: %s", tz_env ? tz_env : "NOT SET");
-          
-          // ESPHome timezone
-          ESP_LOGI("TZ_TEST", "ESPHome timezone: (not available)");
-          
-          // Time valid?
-          ESP_LOGI("TZ_TEST", "Time valid: %s", id(sntp_time).now().is_valid() ? "YES" : "NO");
-          ESP_LOGI("TZ_TEST", "Timestamp: %ld", id(sntp_time).now().timestamp);
-          
-          // Local time
-          auto local = id(sntp_time).now();
-          ESP_LOGI("TZ_TEST", "Local: %04d-%02d-%02d %02d:%02d:%02d (ts: %ld)",
-                  local.year, local.month, local.day_of_month,
-                  local.hour, local.minute, local.second,
-                  local.timestamp);
-          
-          // UTC time
-          auto utc = id(sntp_time).utcnow();
-          ESP_LOGI("TZ_TEST", "UTC:   %04d-%02d-%02d %02d:%02d:%02d (ts: %ld)",
-                  utc.year, utc.month, utc.day_of_month,
-                  utc.hour, utc.minute, utc.second,
-                  utc.timestamp);
-          
-          // ✅ ПРАВИЛЬНЫЙ РАСЧЁТ OFFSET
-          int32_t offset_hours = local.hour - utc.hour;
-          int32_t offset_minutes = local.minute - utc.minute;
-          int32_t offset_seconds = local.second - utc.second;
-          
-          // Учитываем переход через полночь
-          if (offset_hours > 12) offset_hours -= 24;
-          if (offset_hours < -12) offset_hours += 24;
-          
-          int32_t total_offset = offset_hours * 3600 + offset_minutes * 60 + offset_seconds;
-          
-          ESP_LOGI("TZ_TEST", "Offset: %+d seconds (%+d hours)", 
-                  total_offset, offset_hours);
-          ESP_LOGI("TZ_TEST", "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
